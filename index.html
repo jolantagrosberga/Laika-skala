@@ -8,22 +8,9 @@
 <style>
   :root {
     --bg: #ffffff;
-    --surface: #f2f2f2;
-    --card: #ffffff;
     --accent: #b07d2a;
-    --accent2: #c47d5a;
     --text: #1a1a2e;
     --muted: #555577;
-    --border: rgba(0,0,0,0.10);
- 
-    --col-prehistoric: #7a6b4a;
-    --col-ancient: #c47d5a;
-    --col-antique: #d4aa60;
-    --col-medieval: #6a8a6a;
-    --col-renaissance: #5a8a9a;
-    --col-baroque: #8a6a9a;
-    --col-modern: #5a7aaa;
-    --col-contemporary: #4a8a7a;
   }
  
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,13 +25,12 @@
   }
  
   header {
-    padding: 1.5rem 2rem 1.2rem;
+    padding: 1.2rem 2rem 1rem;
     text-align: center;
     background: #fff;
     border-bottom: 2px solid #e0d8c8;
     position: relative;
   }
- 
   header::after {
     content: '';
     position: absolute;
@@ -52,26 +38,20 @@
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
   }
- 
   header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-size: clamp(1.2rem, 3vw, 2rem);
     color: #3a2800;
     letter-spacing: 0.03em;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
   }
+  header p { color: var(--muted); font-size: 0.85rem; font-weight: 300; }
  
-  header p {
-    color: var(--muted);
-    font-size: 0.88rem;
-    font-weight: 300;
-  }
- 
-  /* ── TIMELINE WRAPPER ─────────────────────────────────── */
+  /* ── TIMELINE WRAPPER ── */
   .timeline-outer {
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 1.5rem 1.5rem 0.5rem;
+    padding: 1rem 1.5rem 0.5rem;
     cursor: grab;
     user-select: none;
     scrollbar-width: thin;
@@ -88,35 +68,19 @@
     gap: 4px;
     min-width: 2800px;
     padding-bottom: 0.5rem;
-    position: relative;
   }
  
-  /* ── ROWS ─────────────────────────────────────────────── */
+  /* ── ROWS ── */
   .row {
     display: flex;
     align-items: stretch;
     height: 52px;
     gap: 3px;
-    position: relative;
   }
+  .row.wide-row  { height: 36px; }
+  .row.style-row { height: 110px; }
  
-  /* Wide rows (top label rows) stay shorter */
-  .row.wide-row {
-    height: 36px;
-  }
- 
-  /* Main style row — taller to fit vertical text */
-  .row.style-row {
-    height: 110px;
-  }
- 
-  .row-label {
-    width: 0;
-    overflow: visible;
-    position: relative;
-  }
- 
-  /* ── BLOCKS ───────────────────────────────────────────── */
+  /* ── BLOCKS ── */
   .block {
     border-radius: 6px;
     display: flex;
@@ -135,25 +99,7 @@
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    /* text fits horizontally first; JS will add .vertical if block is narrow */
   }
- 
-  /* Vertical text for narrow blocks */
-  .block.vertical {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform-origin: center center;
-    letter-spacing: 0.06em;
-    padding: 6px 4px;
-    font-size: 0.65rem;
-  }
-  .block.vertical:hover {
-    transform: translateX(-3px) scaleX(1.06);
-  }
-  .block.vertical.active {
-    transform: translateX(-4px) scaleX(1.08);
-  }
- 
   .block::before {
     content: '';
     position: absolute;
@@ -161,38 +107,48 @@
     background: rgba(255,255,255,0);
     transition: background 0.15s;
   }
- 
+  .block.vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.06em;
+    padding: 6px 4px;
+    font-size: 0.65rem;
+  }
   .block:not(.vertical):hover {
     transform: translateY(-3px) scaleY(1.04);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-    border-color: rgba(255,255,255,0.5);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.6);
+    z-index: 10;
+  }
+  .block.vertical:hover {
+    transform: translateX(-3px) scaleX(1.06);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.6);
     z-index: 10;
   }
   .block:hover::before { background: rgba(255,255,255,0.1); }
- 
-  .block:not(.vertical).active {
+  .block.active {
     border-color: #fff;
-    box-shadow: 0 0 0 2px rgba(0,0,0,0.2), 0 8px 28px rgba(0,0,0,0.3);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.15), 0 8px 28px rgba(0,0,0,0.25);
     z-index: 20;
-    transform: translateY(-4px) scaleY(1.06);
   }
  
   /* colour families */
   .era-prehistoric { background: linear-gradient(135deg,#5c4f34,#7a6b4a); color: #f0e8d0; }
-  .era-ancient      { background: linear-gradient(135deg,#7a4a30,#c47d5a); color: #fde8d8; }
-  .era-antique      { background: linear-gradient(135deg,#a07830,#d4aa60); color: #fff4d0; }
-  .era-byzantine    { background: linear-gradient(135deg,#7a5030,#b87840); color: #ffe8c8; }
-  .era-medieval     { background: linear-gradient(135deg,#3a5a3a,#6a8a6a); color: #d8f0d8; }
-  .era-renaissance  { background: linear-gradient(135deg,#2a5a6a,#5a8a9a); color: #d0ecf4; }
-  .era-baroque      { background: linear-gradient(135deg,#5a3a7a,#8a6a9a); color: #ead8f8; }
-  .era-classical    { background: linear-gradient(135deg,#2a4a7a,#5a7aaa); color: #d0ddf8; }
-  .era-romantic     { background: linear-gradient(135deg,#7a3a4a,#aa6a7a); color: #f8d8e0; }
-  .era-modern       { background: linear-gradient(135deg,#2a5a7a,#5a8aaa); color: #d0e8f8; }
-  .era-contemporary { background: linear-gradient(135deg,#1a5a4a,#4a8a7a); color: #d0f0e8; }
-  .era-axis         { background: transparent; color: var(--muted); font-size: 0.65rem; border: none !important; cursor: default !important; }
-  .era-axis:hover   { transform: none !important; box-shadow: none !important; }
+  .era-ancient     { background: linear-gradient(135deg,#7a4a30,#c47d5a); color: #fde8d8; }
+  .era-antique     { background: linear-gradient(135deg,#a07830,#d4aa60); color: #fff4d0; }
+  .era-byzantine   { background: linear-gradient(135deg,#7a5030,#b87840); color: #ffe8c8; }
+  .era-medieval    { background: linear-gradient(135deg,#3a5a3a,#6a8a6a); color: #d8f0d8; }
+  .era-renaissance { background: linear-gradient(135deg,#2a5a6a,#5a8a9a); color: #d0ecf4; }
+  .era-baroque     { background: linear-gradient(135deg,#5a3a7a,#8a6a9a); color: #ead8f8; }
+  .era-classical   { background: linear-gradient(135deg,#2a4a7a,#5a7aaa); color: #d0ddf8; }
+  .era-romantic    { background: linear-gradient(135deg,#7a3a4a,#aa6a7a); color: #f8d8e0; }
+  .era-modern      { background: linear-gradient(135deg,#2a5a7a,#5a8aaa); color: #d0e8f8; }
+  .era-contemporary{ background: linear-gradient(135deg,#1a5a4a,#4a8a7a); color: #d0f0e8; }
+  .era-axis { background: transparent; border: none !important; cursor: default !important; }
+  .era-axis:hover { transform: none !important; box-shadow: none !important; }
  
-  /* ── AXIS ─────────────────────────────────────────────── */
+  /* ── AXIS ── */
   .axis-row {
     display: flex;
     align-items: center;
@@ -201,175 +157,41 @@
     border-top: 2px solid #555;
     margin-top: 6px;
   }
- 
   .axis-tick {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
     font-size: 0.78rem;
     font-weight: 700;
     color: #222;
     border-left: 2px solid #888;
     height: 100%;
     padding-left: 5px;
-    letter-spacing: 0.01em;
   }
  
-  /* ── MODAL ─────────────────────────────────────────────── */
- 
-  .modal {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    max-width: 560px;
-    width: 100%;
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.22);
-    animation: modalIn 0.25s cubic-bezier(.34,1.4,.64,1) both;
-  }
- 
-  @keyframes modalIn {
-    from { opacity:0; transform: scale(0.88) translateY(20px); }
-    to   { opacity:1; transform: scale(1) translateY(0); }
-  }
- 
-  .modal-header {
-    padding: 1.6rem 1.8rem 1.2rem;
-    position: relative;
-  }
- 
-  .modal-era-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    opacity: 0.75;
-    margin-bottom: 0.4rem;
-  }
- 
-  .modal-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.9rem;
-    color: #fff;
-    line-height: 1.15;
-    margin-bottom: 0.25rem;
-  }
- 
-  .modal-period {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.5);
-    font-weight: 300;
-  }
- 
-  .modal-close {
-    position: absolute;
-    top: 1.2rem; right: 1.4rem;
-    background: rgba(255,255,255,0.08);
-    border: none; color: #fff;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
-  }
-  .modal-close:hover { background: rgba(255,255,255,0.18); }
- 
-  .modal-body {
-    padding: 0 1.8rem 1.8rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-  }
- 
-  .modal-desc {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: #333;
-    font-weight: 300;
-  }
- 
-  .modal-section-title {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 0.35rem;
-  }
- 
-  .modal-features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
- 
-  .feature-tag {
-    background: #f5f0e8;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 0.78rem;
-    color: #444;
-  }
- 
-  .modal-artwork {
-    background: #f8f6f0;
-    border: 1px solid #e0d8c8;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-  }
- 
-  .artwork-icon {
-    font-size: 2rem;
-    line-height: 1;
-    flex-shrink: 0;
-  }
- 
-  .artwork-info strong {
-    display: block;
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 0.95rem;
-    color: #1a1a2e;
-    margin-bottom: 0.15rem;
-  }
-  .artwork-info span {
-    font-size: 0.8rem;
-    color: #777;
-  }
- 
-  /* ── LEGEND ─────────────────────────────────────────── */
+  /* ── LEGEND ── */
   .legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 16px;
-    padding: 1.2rem 1.5rem;
+    gap: 6px 14px;
+    padding: 0.8rem 1.5rem;
     background: #f5f3ee;
     border-top: 1px solid #ddd;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: #555;
   }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
  
-  .modal-close {
-    position: absolute;
-    top: 1.2rem; right: 1.4rem;
-    background: rgba(0,0,0,0.08);
-    border: none; color: #333;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
+  .hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #999;
+    padding: 0.4rem 1rem 0.6rem;
+    font-style: italic;
   }
-  .modal-close:hover { background: rgba(0,0,0,0.16); }
  
+  /* ── MODAL ── */
   .modal-backdrop {
     display: none;
     position: fixed;
@@ -383,24 +205,186 @@
   }
   .modal-backdrop.open { display: flex; }
  
-  .legend-item {
+  .modal {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    max-width: 580px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.22);
+    animation: modalIn 0.25s cubic-bezier(.34,1.4,.64,1) both;
+    max-height: 90vh;
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+  }
+  @keyframes modalIn {
+    from { opacity:0; transform: scale(0.88) translateY(20px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
   }
  
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 3px;
+  .modal-header {
+    padding: 1.4rem 1.8rem 1rem;
+    position: relative;
     flex-shrink: 0;
   }
+  .modal-era-badge {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+  }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 0.2rem;
+  }
+  .modal-period { font-size: 0.78rem; color: rgba(255,255,255,0.55); font-weight: 300; }
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    background: rgba(0,0,0,0.12);
+    border: none; color: #fff;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: rgba(0,0,0,0.25); }
  
-  .hint {
-    text-align: center;
-    font-size: 0.78rem;
-    color: #888;
-    padding: 0.6rem 1rem 1.2rem;
+  .modal-body {
+    padding: 1rem 1.8rem 1.6rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+ 
+  .modal-desc {
+    font-size: 0.93rem;
+    line-height: 1.7;
+    color: #333;
+    font-weight: 300;
+  }
+  .modal-section-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  .modal-features { display: flex; flex-wrap: wrap; gap: 5px; }
+  .feature-tag {
+    background: #f5f0e8;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 3px 11px;
+    font-size: 0.76rem;
+    color: #444;
+  }
+ 
+  /* ── ARTWORK ── */
+  .modal-artwork {
+    background: #f8f6f0;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .artwork-img-wrap {
+    position: relative;
+    cursor: zoom-in;
+    overflow: hidden;
+    max-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8e4dc;
+  }
+  .artwork-img-wrap img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
+  .artwork-img-wrap:hover img { transform: scale(1.03); }
+  .artwork-zoom-hint {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    border-radius: 10px;
+    pointer-events: none;
+  }
+  .artwork-info {
+    padding: 0.75rem 1rem;
+  }
+  .artwork-info strong {
+    display: block;
+    font-family: 'Playfair Display', serif;
     font-style: italic;
+    font-size: 0.93rem;
+    color: #1a1a2e;
+    margin-bottom: 0.1rem;
+  }
+  .artwork-info span { font-size: 0.78rem; color: #777; }
+ 
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 88vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.6);
+    animation: lbIn 0.2s ease both;
+  }
+  @keyframes lbIn {
+    from { opacity:0; transform: scale(0.92); }
+    to   { opacity:1; transform: scale(1); }
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    background: rgba(255,255,255,0.12);
+    border: none; color: #fff;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.25); }
+  .lightbox-caption {
+    position: absolute;
+    bottom: 1.2rem;
+    left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    font-style: italic;
+    text-align: center;
+    pointer-events: none;
   }
 </style>
 </head>
@@ -408,16 +392,14 @@
  
 <header>
   <h1>Mākslas stilu laika josla</h1>
-  <p>Klikšķini uz jebkura laikmeta vai stila, lai uzzinātu vairāk · Ritini horizontāli, lai pārvietotos pa vēsturi</p>
+  <p>Spied uz jebkura laikmeta vai stila · Ritini horizontāli, lai pārvietotos pa vēsturi</p>
 </header>
  
 <div class="timeline-outer" id="timelineOuter">
-  <div class="timeline-canvas" id="timelineCanvas">
-    <!-- rows injected by JS -->
-  </div>
+  <div class="timeline-canvas" id="timelineCanvas"></div>
 </div>
  
-<p class="hint">☞ Spied uz jebkura bloka · Velc, lai ritinātu</p>
+<p class="hint">☞ Spied uz jebkura bloka · Velc vai ritini, lai pārvietotos</p>
  
 <div class="legend">
   <div class="legend-item"><div class="legend-dot" style="background:#7a6b4a"></div>Aizvēsture</div>
@@ -446,7 +428,10 @@
         <div class="modal-features" id="modalFeatures"></div>
       </div>
       <div class="modal-artwork" id="modalArtwork">
-        <div class="artwork-icon" id="artworkIcon"></div>
+        <div class="artwork-img-wrap" id="artworkImgWrap">
+          <img id="artworkImg" src="" alt="" loading="lazy">
+          <span class="artwork-zoom-hint">🔍 Spied, lai palielinātu</span>
+        </div>
         <div class="artwork-info">
           <strong id="artworkTitle"></strong>
           <span id="artworkAuthor"></span>
@@ -456,9 +441,16 @@
   </div>
 </div>
  
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+ 
 <script>
 /* ═══════════════════════════════════════════════
-   DATA
+   DATA — with Wikimedia Commons image URLs
 ═══════════════════════════════════════════════ */
 const DATA = {
   "akmens-laikmets": {
@@ -468,7 +460,9 @@ const DATA = {
     color: "era-prehistoric",
     desc: "Cilvēces pirmie mākslinieciskie izpausmes – alu gleznojumi, reljefs un nelielas skulptūras. Māksla kalpoja maģiskiem un rituāliem mērķiem, attēlojot dzīvniekus un medību ainas.",
     features: ["Alu gleznojumi", "Petroglifi", "Vēneras figurīnas", "Dabiskie pigmenti"],
-    artwork: "🦬", artworkTitle: "Altamiras alu gleznojumi", artworkAuthor: "ap 36 000 g. p.m.ē. · Spānija"
+    artworkTitle: "Altamiras alu gleznojumi",
+    artworkAuthor: "ap 36 000 g. p.m.ē. · Spānija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/AltamiraBison.jpg/800px-AltamiraBison.jpg"
   },
   "bronzas-laikmets": {
     title: "Bronzas laikmets",
@@ -477,7 +471,9 @@ const DATA = {
     color: "era-prehistoric",
     desc: "Parādās pirmās civilizācijas – Ēģipte, Mezopotāmija. Metāla apstrāde ļauj radīt sarežģītākus priekšmetus. Māksla kļūst reprezentatīva un saistīta ar varu.",
     features: ["Bronzas lējumi", "Rotaslietas", "Reljefs", "Rituālie trauki"],
-    artwork: "⚱️", artworkTitle: "Bronzas šķēps un rituālais trauks", artworkAuthor: "ap 2000 g. p.m.ē."
+    artworkTitle: "Nebras debess disks",
+    artworkAuthor: "ap 1600 g. p.m.ē. · Halle, Vācija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Nebra_Scheibe.jpg/600px-Nebra_Scheibe.jpg"
   },
   "dzelzs-laikmets": {
     title: "Dzelzs laikmets",
@@ -486,7 +482,9 @@ const DATA = {
     color: "era-prehistoric",
     desc: "Dzelzs rīku un ieroču izplatīšanās. Eiropas ķeltu un ģermāņu tautu ornamentālā māksla – sarežģīti interlace motīvi, dzīvnieku stils.",
     features: ["Ķeltu ornaments", "Saktas un diadēmas", "Dzīvnieku stils", "Interlace"],
-    artwork: "🗡️", artworkTitle: "Ķeltu Battersea vairogs", artworkAuthor: "ap 350–50 g. p.m.ē. · Londonas Britu muzejs"
+    artworkTitle: "Battersea vairogs",
+    artworkAuthor: "ap 350–50 g. p.m.ē. · Britu muzejs, Londona",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Battersea_Shield.jpg/400px-Battersea_Shield.jpg"
   },
   "mezopotamija": {
     title: "Mezopotāmijas māksla",
@@ -495,7 +493,9 @@ const DATA = {
     color: "era-ancient",
     desc: "Starp Tigru un Eifrata upēm dzimušā civilizācija – šumeri, babilonieši, asīrieši – radīja grandiozas celtnes, reljefus un rakstu mākslu. Māksla kalpoja valdnieka un dievu pagodināšanai.",
     features: ["Zikurāti", "Ķīļraksts", "Karaļu reljefs", "Fajanss un lapis lazuli"],
-    artwork: "🏛️", artworkTitle: "Hammurabi kodekss", artworkAuthor: "ap 1754 g. p.m.ē. · Luvra, Parīze"
+    artworkTitle: "Hammurabi kodekss",
+    artworkAuthor: "ap 1754 g. p.m.ē. · Luvra, Parīze",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/P1050763_Louvre_code_Hammurabi_face_rwk.JPG/440px-P1050763_Louvre_code_Hammurabi_face_rwk.JPG"
   },
   "egipte": {
     title: "Senās Ēģiptes māksla",
@@ -504,7 +504,9 @@ const DATA = {
     color: "era-ancient",
     desc: "Ēģiptes māksla bija stingri kanoniska – figūras attēlotas pēc noteiktiem proporciju likumiem. Visa māksla kalpoja mūžības idejai – piramīdas, tempļi un mumifikācija.",
     features: ["Frontāla pozīcija", "Hieratiskais mērogs", "Hieroglifi", "Monumentalitāte"],
-    artwork: "🏺", artworkTitle: "Nefertites biste", artworkAuthor: "ap 1345 g. p.m.ē. · Berlīnes Ēģiptes muzejs"
+    artworkTitle: "Nefertites biste",
+    artworkAuthor: "ap 1345 g. p.m.ē. · Berlīnes Ēģiptes muzejs",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Nofretete_Neues_Museum.jpg/440px-Nofretete_Neues_Museum.jpg"
   },
   "pirmatneja": {
     title: "Pirmatnējā māksla",
@@ -513,7 +515,9 @@ const DATA = {
     color: "era-prehistoric",
     desc: "Tradicionālās kultūras un cilšu sabiedrību vizuālā izteiksme. Ietver Āfrikas, Okeānijas, Amerikas un citu reģionu pirmiedzīvotāju mākslu – totemismus, rituālās maskas, keramiku.",
     features: ["Totēmi", "Rituālās maskas", "Ķermeņa māksla", "Keramika"],
-    artwork: "🗿", artworkTitle: "Lieldienu salas moai statuja", artworkAuthor: "ap 1400–1650 · Čīle"
+    artworkTitle: "Lieldienu salas moai statuja",
+    artworkAuthor: "ap 1400–1650 · Čīle",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Moai_Rano_raraku.jpg/440px-Moai_Rano_raraku.jpg"
   },
   "kristietibas-sakums": {
     title: "Kristietības sākums",
@@ -522,16 +526,20 @@ const DATA = {
     color: "era-medieval",
     desc: "Agrīnās kristietības simboliskā māksla katakombās un bazīlikās. Kristus un apustuļu attēli, simboli (zivs, jērs, krusts). Māksla kalpo ticības mācīšanai.",
     features: ["Simbolisms", "Freski katakombās", "Mozaīkas", "Bazīlikas"],
-    artwork: "✝️", artworkTitle: "Kristus kā Labais Gans", artworkAuthor: "3. gs. · Romas katakomba"
+    artworkTitle: "Kristus kā Labais Gans",
+    artworkAuthor: "3. gs. · Romas katakomba",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Good_shepherd_catacomb_of_priscilla.jpg/440px-Good_shepherd_catacomb_of_priscilla.jpg"
   },
   "antika": {
     title: "Antīkā māksla",
     period: "ap 800 g. p.m.ē. – 5. gs. m.ē.",
     era: "Antīkā pasaule",
     color: "era-antique",
-    desc: "Senās Grieķijas un Romas māksla, kas izstrādāja ideālo cilvēka proporciju kanonu. Demokrātija un filozofija ietekmēja harmonijas, skaistuma un racionālisma principus, kas kalpoja par pamatu Eiropas mākslai.",
+    desc: "Senās Grieķijas un Romas māksla, kas izstrādāja ideālo cilvēka proporciju kanonu. Demokrātija un filozofija ietekmēja harmonijas, skaistuma un racionālisma principus.",
     features: ["Ideāla proporcija", "Marmora skulptūra", "Perspektīva", "Kolonnādes"],
-    artwork: "🏛️", artworkTitle: "Diskobolus (Diska metējs)", artworkAuthor: "Mirons, ap 450 g. p.m.ē."
+    artworkTitle: "Venera no Milovas (Afrodīte)",
+    artworkAuthor: "ap 150 g. p.m.ē. · Luvra, Parīze",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/AGMA_Aphrodite_of_Milos.jpg/440px-AGMA_Aphrodite_of_Milos.jpg"
   },
   "sena-griekija": {
     title: "Senās Grieķijas māksla",
@@ -540,7 +548,9 @@ const DATA = {
     color: "era-antique",
     desc: "Grieķu māksla evolucionēja no ģeometriskiem motīviem uz idealizētu reālismu. Trīs arhitektūras ordeņi – doriešu, jonijas, korintijas – un skulptūra, kas slavē cilvēka ķermeņa skaistumu.",
     features: ["Trīs ordeņi", "Sarkanfigūru keramika", "Mitoloģija", "Ideālais ķermenis"],
-    artwork: "⚱️", artworkTitle: "Atēnas Partenons", artworkAuthor: "Iktīns un Kallikrāts, 447–438 g. p.m.ē."
+    artworkTitle: "Atēnas Partenons",
+    artworkAuthor: "447–438 g. p.m.ē. · Atēnas",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/The_Parthenon_in_Athens.jpg/800px-The_Parthenon_in_Athens.jpg"
   },
   "sena-roma": {
     title: "Senās Romas māksla",
@@ -548,71 +558,87 @@ const DATA = {
     era: "Antīkā pasaule",
     color: "era-antique",
     desc: "Roma pārņēma grieķu tradīcijas, pievienojot praktisku monumentalitāti. Lieliskas inženierbūves – kolizejs, akvedukti, ceļi. Portrets kā reālistisks attēls.",
-    features: ["Portreta skulptūra", "Triumfa arkas", "Fresku glezniecība", "Mozaīkas"],
-    artwork: "🏟️", artworkTitle: "Kolizejs (Flavija amfiteātris)", artworkAuthor: "70–80 m.ē. · Roma"
+    features: ["Portreta skulptūra", "Triumfa arkas", "Freskas", "Mozaīkas"],
+    artworkTitle: "Kolizejs",
+    artworkAuthor: "70–80 m.ē. · Roma",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/800px-Colosseo_2020.jpg"
   },
   "viduslaiki": {
     title: "Viduslaiku māksla",
     period: "5. – 15. gs.",
     era: "Viduslaiki",
     color: "era-medieval",
-    desc: "Viduslaiku Eiropas māksla bija pakārtota Baznīcas mācībai – glezniecība, tēlniecība un arhitektūra kalpoja dievbijībai. Svētbilžu (ikonu) tradīcija, iluminētās rokraksta grāmatas un katedrāļu celtniecība.",
+    desc: "Viduslaiku Eiropas māksla bija pakārtota Baznīcas mācībai – glezniecība, tēlniecība un arhitektūra kalpoja dievbijībai. Iluminētās rokraksta grāmatas un katedrāļu celtniecība.",
     features: ["Reliģisks saturs", "Zelta fons", "Hieratiskums", "Vitrāži"],
-    artwork: "⛪", artworkTitle: "Šartras katedrāle un vitrāži", artworkAuthor: "12.–13. gs. · Francija"
+    artworkTitle: "Šartras katedrāle",
+    artworkAuthor: "12.–13. gs. · Francija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Chartres_Cathedral_Royal_Portal_right_door_tympanum.jpg/440px-Chartres_Cathedral_Royal_Portal_right_door_tympanum.jpg"
   },
   "bizantija": {
     title: "Bizantijas māksla",
     period: "4. – 15. gs.",
     era: "Viduslaiki",
     color: "era-byzantine",
-    desc: "Austrumromas impērijas reliģiozā māksla ar ikonogrāfiju kā galveno žanru. Bagātīgas mozaīkas, zelta foni un stingri kanonizēti tēlu attēlojumi – ikonas rakstītas pēc noteiktiem garīgiem likumiem.",
+    desc: "Austrumromas impērijas reliģiozā māksla ar ikonogrāfiju kā galveno žanru. Bagātīgas mozaīkas, zelta foni un stingri kanonizēti tēlu attēlojumi.",
     features: ["Ikonas", "Mozaīkas", "Zelta fons", "Gaismas simbolisms"],
-    artwork: "✨", artworkTitle: "Svētā Sofija un mozaīkas", artworkAuthor: "6. gs. · Konstantinopole (Stambula)"
+    artworkTitle: "Kristus Pantokrators mozaīka",
+    artworkAuthor: "12. gs. · Palermo, Sicīlija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Christ_Pantocrator_Cefalù.jpg/440px-Christ_Pantocrator_Cefalù.jpg"
   },
   "eiropasvidu": {
     title: "Eiropas viduslaiku māksla",
     period: "8. – 13. gs.",
     era: "Viduslaiki",
     color: "era-medieval",
-    desc: "Karolingas un Otonijas renesanse, Iluminētās Bībeles un psaltīri. Monumentālas fresku programmas baznīcās – māksla kā Rakstu grāmata analfabētiem.",
+    desc: "Karolingas un Otonijas renesanse, Iluminētās Bībeles un psaltīri. Monumentālas fresku programmas baznīcās.",
     features: ["Fresku cikli", "Iluminētas grāmatas", "Kapiteli", "Tapiserijas"],
-    artwork: "📖", artworkTitle: "Kella grāmata", artworkAuthor: "ap 800. g. · Dublina, Trīsvienības kolēdža"
+    artworkTitle: "Kella grāmata (lappuse)",
+    artworkAuthor: "ap 800. g. · Dublina, Trīsvienības kolēdža",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/KellsFol034rChristEnthroned.jpg/440px-KellsFol034rChristEnthroned.jpg"
   },
   "agrinie-viduslaiki": {
     title: "Agrīnie viduslaiki",
     period: "4. – 10. gs.",
     era: "Viduslaiki",
     color: "era-medieval",
-    desc: "Tautu migrācijas periods – ģermāņu, vikingu un ķeltu māksla savijās ar kristīgajiem motīviem. Dzīvnieku stilam, interlace ornamentam un zeltzedzenei raksturīgs izcils amatniecības līmenis.",
-    features: ["Interlace ornaments", "Dzīvnieku stils", "Zeltzedenē", "Bruņurupuča sakta"],
-    artwork: "🐉", artworkTitle: "Sutton Hū ķivere", artworkAuthor: "ap 625. g. · Britu muzejs, Londona"
+    desc: "Tautu migrācijas periods – ģermāņu, vikingu un ķeltu māksla savijās ar kristīgajiem motīviem. Interlace ornaments un zeltzedzenē.",
+    features: ["Interlace ornaments", "Dzīvnieku stils", "Zeltzedenē", "Vikingu māksla"],
+    artworkTitle: "Sutton Hū ķivere",
+    artworkAuthor: "ap 625. g. · Britu muzejs, Londona",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Sutton_Hoo_helmet_2016.jpg/440px-Sutton_Hoo_helmet_2016.jpg"
   },
   "romanika": {
     title: "Romānika",
     period: "10. – 13. gs.",
     era: "Viduslaiki",
     color: "era-medieval",
-    desc: "Pirmais paneiropas mākslas stils – masīvas akmens celtnes ar lokainu arku, biezu sienu. Baznīcas kalpoja kā ceļotāju svētvieta un garīgais centrs. Raksturīgi portālu tympani ar Pēdējās tiesas ainu.",
-    features: ["Pusloka arkas", "Masīvas sienas", "Tympani reljefi", "Pilnu kolumnu rindas"],
-    artwork: "🕍", artworkTitle: "Vezelē bazilika un tympans", artworkAuthor: "12. gs. · Francija"
+    desc: "Pirmais paneiropas mākslas stils – masīvas akmens celtnes ar pusloka arku. Baznīcas kalpoja kā ceļotāju svētvieta. Portālu tympani ar Pēdējās tiesas ainu.",
+    features: ["Pusloka arkas", "Masīvas sienas", "Tympani reljefi", "Kolumnu rindas"],
+    artworkTitle: "Vezelē bazilika – tympans",
+    artworkAuthor: "12. gs. · Francija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Vezelay_Basilique_Madeleine_Tympan_narthex_250608_03.jpg/800px-Vezelay_Basilique_Madeleine_Tympan_narthex_250608_03.jpg"
   },
   "gotika": {
     title: "Gotika",
     period: "12. – 15. gs.",
     era: "Viduslaiki",
     color: "era-medieval",
-    desc: "Gotika centās uz augšu – smailās arkas, augsti torņi un gaismu caurlaidīgas vitrāžu sienas. Smailā arka ļāva sienas darīt plānākas, aizpildot tās ar krāsainiem stikliem, kas pārvērta gaismu mistiskā pieredzē.",
+    desc: "Gotika centās uz augšu – smailās arkas, augsti torņi un gaismu caurlaidīgas vitrāžu sienas. Smailā arka ļāva sienas darīt plānākas, aizpildot tās ar krāsainiem stikliem.",
     features: ["Smailā arka", "Vitrāži", "Kontrafori", "Gaismainums"],
-    artwork: "🌈", artworkTitle: "Parīzes Dievmātes katedrāle", artworkAuthor: "1163–1345 · Parīze"
+    artworkTitle: "Parīzes Dievmātes katedrāle",
+    artworkAuthor: "1163–1345 · Parīze",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg/440px-Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg"
   },
   "renesanse": {
     title: "Renesanse",
     period: "14. – 16. gs.",
     era: "Renesanse",
     color: "era-renaissance",
-    desc: "Atdzimšana – atgriešanās pie antīkajiem ideāliem, cilvēks kā visuma centrs. Humānisms, lineārā perspektīva, reālistiska anatomija un gaismas studijas pārveidoja Eiropas mākslu. Leonardo, Mikelandželo, Rafaels.",
+    desc: "Atdzimšana – atgriešanās pie antīkajiem ideāliem, cilvēks kā visuma centrs. Humānisms, lineārā perspektīva, reālistiska anatomija. Leonardo, Mikelandželo, Rafaels.",
     features: ["Lineārā perspektīva", "Humānisms", "Sfumato", "Reālistiska anatomija"],
-    artwork: "🖼️", artworkTitle: "Mona Liza", artworkAuthor: "Leonardo da Vinči, 1503–1519 · Luvra"
+    artworkTitle: "Mona Liza",
+    artworkAuthor: "Leonardo da Vinči, 1503–1519 · Luvra, Parīze",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/402px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
   },
   "manierisums": {
     title: "Manierisums",
@@ -621,115 +647,141 @@ const DATA = {
     color: "era-renaissance",
     desc: "Renesanses vēlīnā fāze – apzināta novirze no harmonijas, izstieptas proporcijas, sarežģītas pozas (figura serpentinata). Mākslinieki eksperimentēja ar krāsu un telpas izkropļojumiem.",
     features: ["Figura serpentinata", "Izstieptas proporcijas", "Izdomātas krāsas", "Sarežģītas kompozīcijas"],
-    artwork: "🎨", artworkTitle: "Madonna ar garo kaklu", artworkAuthor: "Parmidžanīno, 1534–1540 · Florence"
+    artworkTitle: "Madonna ar garo kaklu",
+    artworkAuthor: "Parmidžanīno, 1534–1540 · Florence",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Parmigianino_-_Madonna_dal_collo_lungo.jpg/440px-Parmigianino_-_Madonna_dal_collo_lungo.jpg"
   },
   "baroks": {
     title: "Baroks",
     period: "17. – 18. gs. sākums",
     era: "Baroks",
     color: "era-baroque",
-    desc: "Dramatisms, kustība un emocijas – baroks radās kā Reformācijas atbilde (Kontrreformācija). Intensīva gaismas un ēnas spēle (chiaroscuro), bagātīga dekorativitāte. Karavadžo, Rembrants, Bernīni.",
+    desc: "Dramatisms, kustība un emocijas – baroks radās kā Reformācijas atbilde. Intensīva gaismas un ēnas spēle (chiaroscuro), bagātīga dekorativitāte. Karavadžo, Rembrants, Bernīni.",
     features: ["Chiaroscuro", "Dramatisms", "Kustīgums", "Tenebrisms"],
-    artwork: "💡", artworkTitle: "Svētā Mateja aicinājums", artworkAuthor: "Karavadžo, 1600 · Roma, San Luigi dei Francesi"
+    artworkTitle: "Svētā Mateja aicinājums",
+    artworkAuthor: "Karavadžo, 1600 · Roma",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/The_Calling_of_Saint_Matthew-Caravaggo_%281599-1600%29.jpg/800px-The_Calling_of_Saint_Matthew-Caravaggo_%281599-1600%29.jpg"
   },
   "rokokko": {
     title: "Rokoko",
     period: "18. gs.",
     era: "Baroks",
     color: "era-baroque",
-    desc: "Elegants, rotaļīgs un dekoratīvs stils, kas attīstījās Francijas galmā. Gaišas krāsas, vijīgas formas, greznas interjera rotājumi, mīlas un pastorālās ainas. Fragonārs, Vatō.",
+    desc: "Elegants, rotaļīgs un dekoratīvs stils, kas attīstījās Francijas galmā. Gaišas krāsas, vijīgas formas, mīlas un pastorālās ainas. Fragonārs, Vatō.",
     features: ["Pasteļkrāsas", "S-formas līknes", "Galma elegance", "Pastorālās ainas"],
-    artwork: "🌸", artworkTitle: "Šūpoles", artworkAuthor: "Žans Onorē Fragonārs, 1767 · Londona, Wallace kolekcija"
+    artworkTitle: "Šūpoles",
+    artworkAuthor: "Žans Onorē Fragonārs, 1767 · Londona",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Fragonard%2C_The_Swing.jpg/480px-Fragonard%2C_The_Swing.jpg"
   },
   "realisums": {
     title: "Reālisms",
-    period: "17. gs. (un atkal 19. gs.)",
+    period: "17. gs. un 19. gs.",
     era: "Baroks",
     color: "era-baroque",
     desc: "Patiesīgs ikdienas dzīves attēlojums – zemnieki, strādnieki, tirgus ainas. Nīderlandes zelta laikmets (Vermērs, Rembrands) 17. gs.; Franču reālisms ar Kurbē 19. gs.",
     features: ["Ikdienas motīvi", "Gaismas studija", "Tūlītējs skatījums", "Sociālā kritika"],
-    artwork: "🧑‍🌾", artworkTitle: "Akmeņu šķēlēji", artworkAuthor: "Gistāvs Kurbē, 1849 (bojāts)"
+    artworkTitle: "Meitene ar pērļu auskaru",
+    artworkAuthor: "Jans Vermērs, ap 1665 · Hāga",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/480px-1665_Girl_with_a_Pearl_Earring.jpg"
   },
   "klasicisms": {
     title: "Klasicisms",
     period: "17. – 19. gs.",
     era: "Klasicisms",
     color: "era-classical",
-    desc: "Atgriešanās pie antīkajiem ideāliem – sakārtotība, skaidrība, normas. Francijā uzplauka kā valsts stils ar Luija XIV absolūtismu. Aritekturā – simetrija, kolonnas, frontoni.",
+    desc: "Atgriešanās pie antīkajiem ideāliem – sakārtotība, skaidrība, normas. Francijā uzplauka kā valsts stils ar Luija XIV absolūtismu. Arhitektūrā – simetrija, kolonnas, frontoni.",
     features: ["Antīkie motīvi", "Simetrija", "Normas un kārtība", "Varonīgi sižeti"],
-    artwork: "🏛️", artworkTitle: "Versaļas pils", artworkAuthor: "Žils Hardoens-Mansārs, 1661–1710"
+    artworkTitle: "Versaļas pils un dārzi",
+    artworkAuthor: "Žils Hardoens-Mansārs, 1661–1710 · Francija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Palace_of_Versailles%2C_view_from_the_Gardens.jpg/800px-Palace_of_Versailles%2C_view_from_the_Gardens.jpg"
   },
   "ampirs": {
     title: "Ampīrs",
     period: "ap 1800–1830",
     era: "Klasicisms",
     color: "era-classical",
-    desc: "Napoleona impērijas stils – monumentāls neoklasicisms ar ēģiptiešu un romiešu motīviem. Varenums, triumfs, imperatoriskā simbolika. Interjeros – bagātīgs bronzas apkalums.",
+    desc: "Napoleona impērijas stils – monumentāls neoklasicisms ar ēģiptiešu un romiešu motīviem. Varenums, triumfs, imperatoriskā simbolika.",
     features: ["Imperatoriskā simbolika", "Ēģiptiešu motīvi", "Tumšas koksnes", "Bronzas dekors"],
-    artwork: "👑", artworkTitle: "Napoleona kronēšana", artworkAuthor: "Žaks Luī Davids, 1805–1807 · Luvra"
+    artworkTitle: "Napoleona kronēšana",
+    artworkAuthor: "Žaks Luī Davids, 1805–1807 · Luvra, Parīze",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Jacques-Louis_David_-_The_Coronation_of_Napoleon_%281805-1807%29.jpg/800px-Jacques-Louis_David_-_The_Coronation_of_Napoleon_%281805-1807%29.jpg"
   },
   "romantisms": {
     title: "Romantisms",
     period: "18. gs. beigas – 19. gs. vidus",
     era: "Romantisms",
     color: "era-romantic",
-    desc: "Emocijas pret prātu, daba pret pilsētu, eksotika un pagātne. Romantisms protestēja pret industri­ālo revolūciju, slavinot tautas garu, dabu un personiskās izjūtas. Delakruā, Frīdrihs, Goja.",
+    desc: "Emocijas pret prātu, daba pret pilsētu, eksotika un pagātne. Romantisms protestēja pret industriālo revolūciju, slavinot tautas garu, dabu un personiskās izjūtas.",
     features: ["Emocionalitāte", "Dabas grandiosums", "Eksotika", "Tautas eposs"],
-    artwork: "🌊", artworkTitle: "Brīvība ved tautu", artworkAuthor: "Ežēns Delakruā, 1830 · Luvra, Parīze"
+    artworkTitle: "Brīvība ved tautu",
+    artworkAuthor: "Ežēns Delakruā, 1830 · Luvra, Parīze",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg/800px-Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg"
   },
   "simbolisms": {
     title: "Simbolisms",
     period: "ap 1880–1910",
     era: "Romantisms",
     color: "era-romantic",
-    desc: "Simbolisti pretojās materiālismam un impresionismam, meklējot dziļāku, mistisko patiesību. Sapņi, mīti, nāve un maņu kārdināšana. Gusāvs Moreau, Odilons Redons, Frāns fon Štūks.",
+    desc: "Simbolisti pretojās materiālismam, meklējot dziļāku, mistisko patiesību. Sapņi, mīti, nāve un maņu kārdināšana. Gusāvs Moreau, Odilons Redons, Klimts.",
     features: ["Misticisms", "Sapņainums", "Mitoloģija", "Jutekliskums"],
-    artwork: "🌙", artworkTitle: "Salomeja", artworkAuthor: "Gusāvs Moreau, 1876 · Metropoles muzejs, Ņujorka"
+    artworkTitle: "Skūpsts",
+    artworkAuthor: "Gustavs Klimts, 1907–1908 · Vīne, Belvedere",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/600px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg"
   },
   "impresionisms": {
     title: "Impresionisms",
     period: "ap 1860–1900",
     era: "Modernisms",
     color: "era-modern",
-    desc: "Ārpus studijas – impresionisti glezno brīvā dabā, tverdami gaismas un gaisa efektus. Krāsa vairs nav precīza, bet atstāj iespaidu (impression). Monet, Renoirs, Pizarro, Degā.",
+    desc: "Ārpus studijas – impresionisti glezno brīvā dabā, tverdami gaismas un gaisa efektus. Krāsa vairs nav precīza, bet atstāj iespaidu. Monet, Renoirs, Pizarro, Degā.",
     features: ["Gaismas efekti", "Āra gleznošana", "Redzamie triepieni", "Kustīgums"],
-    artwork: "🌅", artworkTitle: "Iespaids. Saullēkts", artworkAuthor: "Klods Monē, 1872 · Parīze, Marmotāna muzejs"
+    artworkTitle: "Ūdensrozītes",
+    artworkAuthor: "Klods Monē, 1906 · Čikāga",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg/800px-Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg"
   },
   "postimpresionisms": {
     title: "Postimpresionisms",
     period: "ap 1880–1910",
     era: "Modernisms",
     color: "era-modern",
-    desc: "Impresionisma pārveidošana – katrs mākslinieks devās savā virzienā. Sezāns pētīja ģeometriskās formas, Van Gogs – emocijas caur krāsu, Gogēns – primitīvismu, Sera – punktus.",
+    desc: "Impresionisma pārveidošana – katrs mākslinieks devās savā virzienā. Sezāns pētīja ģeometriskās formas, Van Gogs – emocijas caur krāsu, Gogēns – primitīvismu.",
     features: ["Strukturalizācija", "Emocionālā krāsa", "Primitīvisms", "Punktisms"],
-    artwork: "🌻", artworkTitle: "Saulespuķes", artworkAuthor: "Vincents van Gogs, 1888 · Londona, Nacionālā galerija"
+    artworkTitle: "Saulespuķes",
+    artworkAuthor: "Vincents van Gogs, 1888 · Londona, Nacionālā galerija",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg/480px-Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg"
   },
   "jugendstils": {
     title: "Jūgendstils / Art Nouveau",
     period: "ap 1890–1910",
     era: "Modernisms",
     color: "era-modern",
-    desc: "Visas mākslas apvienošana vienā – arhitektūra, mēbeles, plakāts, tekstils. Organiskās formas, vijīgas līnijas, augu un dzīvnieku motīvi. Klimt, Muha, Gaudi, Eckmanns.",
+    desc: "Visas mākslas apvienošana vienā – arhitektūra, mēbeles, plakāts, tekstils. Organiskās formas, vijīgas līnijas, augu un dzīvnieku motīvi. Klimts, Muha, Gaudi.",
     features: ["Organiskās formas", "Vijīgas līnijas", "Dekoratīvisms", "Augu motīvi"],
-    artwork: "🌿", artworkTitle: "Skūpsts", artworkAuthor: "Gustavs Klimts, 1907–1908 · Vīne, Belvedere"
+    artworkTitle: "Alfons Muha – Gismonda (plakāts)",
+    artworkAuthor: "Alfons Muha, 1895",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/twenty/Mucha-Gismonda.jpg/400px-Mucha-Gismonda.jpg"
   },
   "ekspresionisms": {
     title: "Ekspresionisms",
     period: "ap 1905–1925",
     era: "Modernisms",
     color: "era-modern",
-    desc: "Iekšējās emocionālās patiesības pārnese gleznā – deformācija, spilgtas krāsas, nemiers. Bieži atspoguļo modernitātes trauksmi un sociālo kritiku. Munks, Nolde, Kirkhners, Klee.",
+    desc: "Iekšējās emocionālās patiesības pārnese gleznā – deformācija, spilgtas krāsas, nemiers. Bieži atspoguļo modernitātes trauksmi un sociālo kritiku.",
     features: ["Deformācija", "Spilgtas krāsas", "Nemiers", "Emocionālā patiesība"],
-    artwork: "😱", artworkTitle: "Sauciens", artworkAuthor: "Edvards Munks, 1893 · Oslo, Nacionālā galerija"
+    artworkTitle: "Sauciens",
+    artworkAuthor: "Edvards Munks, 1893 · Oslo",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/480px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg"
   },
   "fovisms": {
     title: "Fovisms",
     period: "ap 1905–1910",
     era: "Modernisms",
     color: "era-modern",
-    desc: "\"Mežonīgo zvēru\" (fauves) krāsu eksplosija – krāsa vairs nav reālistiska, bet ir emocionāla un autonoma. Matiss un Dereins izmantoja tīras, spilgtas krāsas.",
+    desc: "\"Mežonīgo zvēru\" krāsu eksplosija – krāsa vairs nav reālistiska, bet ir emocionāla un autonoma. Matiss un Dereins izmantoja tīras, spilgtas krāsas.",
     features: ["Tīras krāsas", "Krāsas autonomija", "Vienkāršotas formas", "Prieks"],
-    artwork: "🎨", artworkTitle: "Deja", artworkAuthor: "Anrī Matiss, 1910 · Sanktpēterburga, Ermitāža"
+    artworkTitle: "Deja",
+    artworkAuthor: "Anrī Matiss, 1910 · Sanktpēterburga, Ermitāža",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Dance_%28I%29_by_Henri_Matisse.jpg/600px-Dance_%28I%29_by_Henri_Matisse.jpg"
   },
   "kubisms": {
     title: "Kubisms",
@@ -738,16 +790,20 @@ const DATA = {
     color: "era-modern",
     desc: "Pikaso un Braks sadrupa reālistisko skatu – objekti redzami no vairākiem skatpunktiem vienlaicīgi, ģeometrizēti. Kubisms radīja revolūciju divdimensiju attēlojumā.",
     features: ["Daudzie skatpunkti", "Ģeometrizācija", "Kolaža", "Analītiskais kubisms"],
-    artwork: "◼️", artworkTitle: "Avinjones dāmas", artworkAuthor: "Pablo Pikaso, 1907 · Ņujorka, MoMA"
+    artworkTitle: "Avinjones dāmas",
+    artworkAuthor: "Pablo Pikaso, 1907 · Ņujorka, MoMA",
+    img: "https://upload.wikimedia.org/wikipedia/en/4/4c/Les_Demoiselles_d%27Avignon.jpg"
   },
   "futurisms": {
     title: "Futurisms",
     period: "ap 1909–1920",
     era: "Modernisms",
     color: "era-modern",
-    desc: "Itāļu kustība, kas slavināja kustību, ātrumu, tehnoloģiju un modernismu. Gleznās attēlota kustība ar vairākkārtīgu attēlu pārklājumu. Bočoni, Severīni, Balla.",
+    desc: "Itāļu kustība, kas slavināja kustību, ātrumu, tehnoloģiju un modernismu. Gleznās attēlota kustība ar vairākkārtīgu attēlu pārklājumu.",
     features: ["Kustības attēlojums", "Ātrums", "Tehnoloģija", "Dinamisms"],
-    artwork: "🚗", artworkTitle: "Pilsētas augšupcelšanās", artworkAuthor: "Umberto Bočoni, 1910–1911 · Ņujorka, MoMA"
+    artworkTitle: "Pilsētas augšupcelšanās",
+    artworkAuthor: "Umberto Bočoni, 1910–1911 · Ņujorka, MoMA",
+    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Umberto_Boccioni_-_The_City_Rises.jpg/800px-Umberto_Boccioni_-_The_City_Rises.jpg"
   },
   "sirrealisums": {
     title: "Sūrreālisms",
@@ -756,25 +812,31 @@ const DATA = {
     color: "era-modern",
     desc: "Sapņu un zemapziņas realitāte gleznā. Sūrreālisti sekoja Freida idejām, radot iracionālas, sapņainas kompozīcijas. Dalī, Magrite, Ernsts, Kahlo.",
     features: ["Sapņu loģika", "Zemapziņa", "Iracionāls", "Automatisms"],
-    artwork: "⏰", artworkTitle: "Atmiņas noturīgums", artworkAuthor: "Salvadors Dalī, 1931 · Ņujorka, MoMA"
+    artworkTitle: "Atmiņas noturīgums",
+    artworkAuthor: "Salvadors Dalī, 1931 · Ņujorka, MoMA",
+    img: "https://upload.wikimedia.org/wikipedia/en/d/dd/The_Persistence_of_Memory.jpg"
   },
   "neformala": {
     title: "Neformālā māksla",
     period: "ap 1940–1960",
     era: "Laikmetīgā māksla",
     color: "era-contemporary",
-    desc: "Abstrakts ekspresionisms un informels – mākslinieks darbojas ar krāsu instinktīvi, bez iepriekšēja plāna. Abstraktie ekspresionisti Ņujorkā (Poloks, de Kūnings), Eiropā – tašisms.",
+    desc: "Abstrakts ekspresionisms un informels – mākslinieks darbojas ar krāsu instinktīvi, bez iepriekšēja plāna. Abstraktie ekspresionisti Ņujorkā (Poloks, de Kūnings).",
     features: ["Instinktīva darbība", "Emocionāla abstrakcija", "Gestikulācija", "Matērija"],
-    artwork: "💧", artworkTitle: "Sieviete I", artworkAuthor: "Vilems de Kūnings, 1950–1952 · Ņujorka, MoMA"
+    artworkTitle: "Numurs 31",
+    artworkAuthor: "Džeksons Poloks, 1950 · Ņujorka, MoMA",
+    img: "https://upload.wikimedia.org/wikipedia/en/8/8a/No._31.jpg"
   },
   "popars": {
     title: "Popārts",
     period: "ap 1956–1970",
     era: "Laikmetīgā māksla",
     color: "era-contemporary",
-    desc: "Augstā māksla tikās ar patēriņa kultūru – reklāmas, komiksi, slavenību attēli. Popārts apšaubīja mākslas un ikdienas robežu. Vorhols, Lihtenšteins, Hamiltons.",
-    features: ["Patēriņa simboli", "Masveidots attēls", "Ironija", "Briļļantās krāsas"],
-    artwork: "🍅", artworkTitle: "Kempbelas zupas bundžas", artworkAuthor: "Endijs Vorhols, 1962 · Ņujorka, MoMA"
+    desc: "Augstā māksla tikās ar patēriņa kultūru – reklāmas, komiksi, slavenību attēli. Popārts apšaubīja mākslas un ikdienas robežu. Vorhols, Lihtenšteins.",
+    features: ["Patēriņa simboli", "Masveidots attēls", "Ironija", "Spilgtas krāsas"],
+    artworkTitle: "Merilyn Monro diptiks",
+    artworkAuthor: "Endijs Vorhols, 1962 · Londona, Tate",
+    img: "https://upload.wikimedia.org/wikipedia/en/5/5f/Marilyn_Diptych_by_Andy_Warhol.jpg"
   },
   "jaunais-realisums": {
     title: "Jaunais reālisms",
@@ -783,7 +845,9 @@ const DATA = {
     color: "era-contemporary",
     desc: "Atgriešanās pie attēlojuma mākslas pēc abstrakcionisma – fotoreālisms un hiperreālisms. Ikdienas priekšmeti un cilvēki gleznoti ar fotokameras precizitāti.",
     features: ["Fotoreālisms", "Precizitāte", "Ikdienas motīvi", "Lielformāts"],
-    artwork: "📸", artworkTitle: "Mednieku vakariņas", artworkAuthor: "Čaks Klouzs, 1971 · Ņujorka, Mūsdienu mākslas muzejs"
+    artworkTitle: "Pašportrets",
+    artworkAuthor: "Čaks Klouzs, 1968 · Mineapolis",
+    img: "https://upload.wikimedia.org/wikipedia/en/3/thirty/Chuck_Close_Self_Portrait_1968.jpg"
   },
   "konceptuala": {
     title: "Konceptuālā māksla",
@@ -792,48 +856,42 @@ const DATA = {
     color: "era-contemporary",
     desc: "Ideja ir svarīgāka par formu – mākslas darbs var būt instrukcija, teksts, performanse vai vide. Konceptuālā māksla apšaubīja mākslas definīciju un muzeja lomu.",
     features: ["Ideja pār formu", "Instalācija", "Performanse", "Konceptuāls process"],
-    artwork: "💡", artworkTitle: "Viena un trīs krēsli", artworkAuthor: "Džozefs Kosuts, 1965 · Ņujorka, MoMA"
+    artworkTitle: "Viena un trīs krēsli",
+    artworkAuthor: "Džozefs Kosuts, 1965 · Ņujorka, MoMA",
+    img: "https://upload.wikimedia.org/wikipedia/en/b/b0/Joseph_Kosuth_One_and_Three_Chairs.jpg"
   }
 };
  
 /* ═══════════════════════════════════════════════
-   TIMELINE LAYOUT  (key = DATA key, w = relative width units, row 0..N)
+   TIMELINE LAYOUT
 ═══════════════════════════════════════════════ */
- 
-// Each row is an array of {key, w} objects.
-// Total width = 2800px across ~280 units
-const U = 10; // px per unit
+const U = 10;
  
 const ROWS = [
-  // Row 0 – Antīkā josla (wide span)
-  [
-    { key:null, label:'', w:18, color:'era-axis' },          // spacer
+  [ // Row 0 – Antīkā josla
+    { key:null, w:18, color:'era-axis' },
     { key:'antika', label:'Antīkā māksla', w:52, color:'era-antique' },
-    { key:null, label:'', w:210, color:'era-axis' },
+    { key:null, w:210, color:'era-axis' },
   ],
-  // Row 1 – Grieķija + Roma
-  [
-    { key:null, label:'', w:10, color:'era-axis' },
+  [ // Row 1 – Grieķija + Roma
+    { key:null, w:10, color:'era-axis' },
     { key:'sena-griekija', label:'Senās Grieķijas māksla', w:34, color:'era-antique' },
     { key:'sena-roma', label:'Senās Romas māksla', w:25, color:'era-antique' },
-    { key:null, label:'', w:211, color:'era-axis' },
+    { key:null, w:211, color:'era-axis' },
   ],
-  // Row 2 – Mezopotāmija
-  [
-    { key:null, label:'', w:6, color:'era-axis' },
+  [ // Row 2 – Mezopotāmija
+    { key:null, w:6, color:'era-axis' },
     { key:'mezopotamija', label:'Mezopotāmijas (Divupes) māksla', w:31, color:'era-ancient' },
-    { key:null, label:'', w:243, color:'era-axis' },
+    { key:null, w:243, color:'era-axis' },
   ],
-  // Row 3 – Ēģipte
-  [
-    { key:null, label:'', w:4, color:'era-axis' },
+  [ // Row 3 – Ēģipte
+    { key:null, w:4, color:'era-axis' },
     { key:'egipte', label:'Senās Ēģiptes māksla', w:31, color:'era-ancient' },
-    { key:null, label:'', w:245, color:'era-axis' },
+    { key:null, w:245, color:'era-axis' },
   ],
-  // Row 4 – Pirmatnējā + Kristietība + Viduslaiku josla
-  [
+  [ // Row 4 – Galvenā stilu rinda
     { key:'pirmatneja', label:'Pirmatnējā māksla', w:16, color:'era-prehistoric' },
-    { key:null, label:'', w:16, color:'era-axis' },
+    { key:null, w:16, color:'era-axis' },
     { key:'kristietibas-sakums', label:'Kristietības sākums', w:4, color:'era-medieval' },
     { key:'viduslaiki', label:'Viduslaiku māksla', w:44, color:'era-medieval' },
     { key:'renesanse', label:'Renesanse', w:10, color:'era-renaissance' },
@@ -858,40 +916,35 @@ const ROWS = [
     { key:'jaunais-realisums', label:'Jaunais reālisms', w:8, color:'era-contemporary' },
     { key:'konceptuala', label:'Konceptuālā māksla', w:10, color:'era-contemporary' },
   ],
-  // Row 5 – Byzantija
-  [
-    { key:null, label:'', w:36, color:'era-axis' },
+  [ // Row 5 – Bizantija
+    { key:null, w:36, color:'era-axis' },
     { key:'bizantija', label:'Bizantijas māksla', w:38, color:'era-byzantine' },
-    { key:null, label:'', w:206, color:'era-axis' },
+    { key:null, w:206, color:'era-axis' },
   ],
-  // Row 6 – Eiropas viduslaiki sub-rows
-  [
-    { key:null, label:'', w:36, color:'era-axis' },
+  [ // Row 6 – Eiropas viduslaiku māksla
+    { key:null, w:36, color:'era-axis' },
     { key:'eiropasvidu', label:'Eiropas viduslaiku māksla', w:38, color:'era-medieval' },
-    { key:null, label:'', w:206, color:'era-axis' },
+    { key:null, w:206, color:'era-axis' },
   ],
-  // Row 7 – Akmens/bronzas/dzelzs laikmeti
-  [
+  [ // Row 7 – Laikmeti
     { key:'akmens-laikmets', label:'akmens laikmets', w:12, color:'era-prehistoric' },
-    { key:null, label:'', w:8, color:'era-axis' },
+    { key:null, w:8, color:'era-axis' },
     { key:'bronzas-laikmets', label:'bronzas laikmets', w:10, color:'era-prehistoric' },
-    { key:null, label:'', w:4, color:'era-axis' },
+    { key:null, w:4, color:'era-axis' },
     { key:'dzelzs-laikmets', label:'dzelzs laikmets', w:14, color:'era-prehistoric' },
-    { key:null, label:'', w:232, color:'era-axis' },
+    { key:null, w:232, color:'era-axis' },
   ],
-  // Row 8 – Agrīnie viduslaiki / Romānika / Gotika
-  [
-    { key:null, label:'', w:36, color:'era-axis' },
+  [ // Row 8 – Agrīnie viduslaiki / Romānika / Gotika
+    { key:null, w:36, color:'era-axis' },
     { key:'agrinie-viduslaiki', label:'Agrīnie viduslaiki', w:16, color:'era-medieval' },
-    { key:null, label:'', w:4, color:'era-axis' },
+    { key:null, w:4, color:'era-axis' },
     { key:'romanika', label:'Romānika', w:10, color:'era-medieval' },
-    { key:null, label:'', w:2, color:'era-axis' },
+    { key:null, w:2, color:'era-axis' },
     { key:'gotika', label:'Gotika', w:10, color:'era-medieval' },
-    { key:null, label:'', w:202, color:'era-axis' },
+    { key:null, w:202, color:'era-axis' },
   ],
 ];
  
-// Axis ticks: {label, pos (units from left)}
 const TICKS = [
   {label:'600 000 g.', pos:0},{label:'40 000', pos:3},{label:'10 000', pos:5},
   {label:'6000 g.p.m.ē.', pos:8},{label:'4000', pos:10},{label:'3000', pos:12},
@@ -904,17 +957,34 @@ const TICKS = [
 ];
  
 /* ═══════════════════════════════════════════════
+   COLOR MAP for modal headers
+═══════════════════════════════════════════════ */
+const COLOR_MAP = {
+  'era-prehistoric':'linear-gradient(135deg,#3a2e18,#5c4f34)',
+  'era-ancient':'linear-gradient(135deg,#4a2a18,#7a4a30)',
+  'era-antique':'linear-gradient(135deg,#5a4010,#a07830)',
+  'era-byzantine':'linear-gradient(135deg,#5a3010,#7a5030)',
+  'era-medieval':'linear-gradient(135deg,#1a3a1a,#3a5a3a)',
+  'era-renaissance':'linear-gradient(135deg,#0a2a3a,#2a5a6a)',
+  'era-baroque':'linear-gradient(135deg,#2a1a4a,#5a3a7a)',
+  'era-classical':'linear-gradient(135deg,#0a1a4a,#2a4a7a)',
+  'era-romantic':'linear-gradient(135deg,#4a1a2a,#7a3a4a)',
+  'era-modern':'linear-gradient(135deg,#0a2a4a,#2a5a7a)',
+  'era-contemporary':'linear-gradient(135deg,#0a2a1a,#1a5a4a)',
+};
+ 
+/* ═══════════════════════════════════════════════
    BUILD TIMELINE
 ═══════════════════════════════════════════════ */
 const canvas = document.getElementById('timelineCanvas');
  
-// First two rows are wide label rows (shorter height)
 ROWS.forEach((rowDef, rowIdx) => {
   const rowEl = document.createElement('div');
   let cls = 'row';
   if (rowIdx < 2) cls += ' wide-row';
-  if (rowIdx === 4) cls += ' style-row'; // main styles row needs height for vertical text
+  if (rowIdx === 4) cls += ' style-row';
   rowEl.className = cls;
+ 
   rowDef.forEach(block => {
     const el = document.createElement('div');
     el.className = 'block ' + block.color;
@@ -932,14 +1002,10 @@ ROWS.forEach((rowDef, rowIdx) => {
   canvas.appendChild(rowEl);
 });
  
-// After render: mark narrow blocks as vertical
+// Mark narrow blocks as vertical
 requestAnimationFrame(() => {
   document.querySelectorAll('.block[data-key]').forEach(el => {
-    const blockPx = parseInt(el.dataset.blockpx);
-    // if block is narrower than ~80px, use vertical text
-    if (blockPx < 80) {
-      el.classList.add('vertical');
-    }
+    if (parseInt(el.dataset.blockpx) < 80) el.classList.add('vertical');
   });
 });
  
@@ -950,9 +1016,7 @@ axisRow.style.minWidth = (280 * U) + 'px';
 let prev = 0;
 TICKS.forEach(t => {
   const spacer = document.createElement('div');
-  spacer.style.width = ((t.pos - prev) * U) + 'px';
-  spacer.style.minWidth = ((t.pos - prev) * U) + 'px';
-  spacer.style.flexShrink = '0';
+  spacer.style.cssText = `width:${(t.pos-prev)*U}px;min-width:${(t.pos-prev)*U}px;flex-shrink:0`;
   axisRow.appendChild(spacer);
   const tick = document.createElement('div');
   tick.className = 'axis-tick';
@@ -964,11 +1028,10 @@ TICKS.forEach(t => {
 canvas.appendChild(axisRow);
  
 /* ═══════════════════════════════════════════════
-   DRAG TO SCROLL (mouse + touch)
+   DRAG TO SCROLL
 ═══════════════════════════════════════════════ */
 const outer = document.getElementById('timelineOuter');
 let isDragging = false, startX, scrollLeft;
- 
 outer.addEventListener('mousedown', e => {
   isDragging = true; startX = e.pageX - outer.offsetLeft; scrollLeft = outer.scrollLeft;
 });
@@ -976,19 +1039,14 @@ window.addEventListener('mouseup', () => { isDragging = false; });
 outer.addEventListener('mousemove', e => {
   if (!isDragging) return;
   e.preventDefault();
-  const x = e.pageX - outer.offsetLeft;
-  outer.scrollLeft = scrollLeft - (x - startX);
+  outer.scrollLeft = scrollLeft - (e.pageX - outer.offsetLeft - startX);
 });
- 
-// Touch support
 outer.addEventListener('touchstart', e => {
   startX = e.touches[0].pageX; scrollLeft = outer.scrollLeft;
 }, { passive: true });
 outer.addEventListener('touchmove', e => {
-  const dx = e.touches[0].pageX - startX;
-  outer.scrollLeft = scrollLeft - dx;
+  outer.scrollLeft = scrollLeft - (e.touches[0].pageX - startX);
 }, { passive: true });
- 
  
 /* ═══════════════════════════════════════════════
    MODAL
@@ -997,7 +1055,6 @@ function openModal(key, el) {
   const d = DATA[key];
   if (!d) return;
  
-  // de-activate previous
   document.querySelectorAll('.block.active').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
  
@@ -1015,28 +1072,20 @@ function openModal(key, el) {
     feats.appendChild(tag);
   });
  
-  document.getElementById('artworkIcon').textContent = d.artwork;
+  // Image
+  const img = document.getElementById('artworkImg');
+  img.src = d.img;
+  img.alt = d.artworkTitle;
   document.getElementById('artworkTitle').textContent = d.artworkTitle;
   document.getElementById('artworkAuthor').textContent = d.artworkAuthor;
  
-  // colour header to match block
-  const hdr = document.getElementById('modalHeader');
-  const colorMap = {
-    'era-prehistoric':'linear-gradient(135deg,#3a2e18,#5c4f34)',
-    'era-ancient':'linear-gradient(135deg,#4a2a18,#7a4a30)',
-    'era-antique':'linear-gradient(135deg,#5a4010,#a07830)',
-    'era-byzantine':'linear-gradient(135deg,#5a3010,#7a5030)',
-    'era-medieval':'linear-gradient(135deg,#1a3a1a,#3a5a3a)',
-    'era-renaissance':'linear-gradient(135deg,#0a2a3a,#2a5a6a)',
-    'era-baroque':'linear-gradient(135deg,#2a1a4a,#5a3a7a)',
-    'era-classical':'linear-gradient(135deg,#0a1a4a,#2a4a7a)',
-    'era-romantic':'linear-gradient(135deg,#4a1a2a,#7a3a4a)',
-    'era-modern':'linear-gradient(135deg,#0a2a4a,#2a5a7a)',
-    'era-contemporary':'linear-gradient(135deg,#0a2a1a,#1a5a4a)',
-  };
-  const bc = document.querySelector(`.block[data-key="${key}"]`);
-  let cls = [...bc.classList].find(c => c.startsWith('era-') && c !== 'era-axis');
-  hdr.style.background = colorMap[cls] || '#1a1825';
+  // Click image → lightbox
+  const wrap = document.getElementById('artworkImgWrap');
+  wrap.onclick = () => openLightbox(d.img, d.artworkTitle + ' · ' + d.artworkAuthor);
+ 
+  // Header colour
+  const colorClass = [...el.classList].find(c => c.startsWith('era-') && c !== 'era-axis');
+  document.getElementById('modalHeader').style.background = COLOR_MAP[colorClass] || '#333';
  
   document.getElementById('modalBackdrop').classList.add('open');
 }
@@ -1045,12 +1094,32 @@ document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('modalBackdrop').addEventListener('click', e => {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeLightbox(); closeModal(); }
+});
  
 function closeModal() {
   document.getElementById('modalBackdrop').classList.remove('open');
   document.querySelectorAll('.block.active').forEach(b => b.classList.remove('active'));
 }
+ 
+/* ═══════════════════════════════════════════════
+   LIGHTBOX
+═══════════════════════════════════════════════ */
+function openLightbox(src, caption) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxCaption').textContent = caption;
+  document.getElementById('lightbox').classList.add('open');
+}
+ 
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+ 
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+});
 </script>
 </body>
 </html>
