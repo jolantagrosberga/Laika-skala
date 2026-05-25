@@ -15,7 +15,7 @@
     --text: #1a1a2e;
     --muted: #555577;
     --border: rgba(0,0,0,0.10);
-
+ 
     --col-prehistoric: #7a6b4a;
     --col-ancient: #c47d5a;
     --col-antique: #d4aa60;
@@ -25,25 +25,25 @@
     --col-modern: #5a7aaa;
     --col-contemporary: #4a8a7a;
   }
-
+ 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   body {
     font-family: 'Source Sans 3', sans-serif;
     background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
     overflow-x: hidden;
+    overflow-y: auto;
   }
-
+ 
   header {
-    padding: 2.5rem 2rem 1.5rem;
+    padding: 1.5rem 2rem 1.2rem;
     text-align: center;
     background: #fff;
     border-bottom: 2px solid #e0d8c8;
     position: relative;
   }
-
+ 
   header::after {
     content: '';
     position: absolute;
@@ -51,25 +51,26 @@
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
   }
-
+ 
   header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
     color: #3a2800;
     letter-spacing: 0.03em;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
   }
-
+ 
   header p {
     color: var(--muted);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     font-weight: 300;
   }
-
+ 
   /* ── TIMELINE WRAPPER ─────────────────────────────────── */
   .timeline-outer {
     overflow-x: auto;
-    padding: 2rem 1.5rem 1rem;
+    overflow-y: visible;
+    padding: 1.5rem 1.5rem 0.5rem;
     cursor: grab;
     user-select: none;
     scrollbar-width: thin;
@@ -79,31 +80,41 @@
   .timeline-outer::-webkit-scrollbar { height: 8px; }
   .timeline-outer::-webkit-scrollbar-track { background: #e8e8e8; }
   .timeline-outer::-webkit-scrollbar-thumb { background: #b07d2a; border-radius: 3px; }
-
+ 
   .timeline-canvas {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     min-width: 2800px;
     padding-bottom: 0.5rem;
     position: relative;
   }
-
+ 
   /* ── ROWS ─────────────────────────────────────────────── */
   .row {
     display: flex;
     align-items: stretch;
-    height: 44px;
+    height: 52px;
     gap: 3px;
     position: relative;
   }
-
+ 
+  /* Wide rows (top label rows) stay shorter */
+  .row.wide-row {
+    height: 36px;
+  }
+ 
+  /* Main style row — taller to fit vertical text */
+  .row.style-row {
+    height: 110px;
+  }
+ 
   .row-label {
     width: 0;
     overflow: visible;
     position: relative;
   }
-
+ 
   /* ── BLOCKS ───────────────────────────────────────────── */
   .block {
     border-radius: 6px;
@@ -111,20 +122,37 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     cursor: pointer;
     border: 1.5px solid transparent;
     transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
-    padding: 4px 6px;
-    line-height: 1.25;
+    padding: 4px 5px;
+    line-height: 1.2;
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
+    /* text fits horizontally first; JS will add .vertical if block is narrow */
   }
-
+ 
+  /* Vertical text for narrow blocks */
+  .block.vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform-origin: center center;
+    letter-spacing: 0.06em;
+    padding: 6px 4px;
+    font-size: 0.65rem;
+  }
+  .block.vertical:hover {
+    transform: translateX(-3px) scaleX(1.06);
+  }
+  .block.vertical.active {
+    transform: translateX(-4px) scaleX(1.08);
+  }
+ 
   .block::before {
     content: '';
     position: absolute;
@@ -132,22 +160,22 @@
     background: rgba(255,255,255,0);
     transition: background 0.15s;
   }
-
-  .block:hover {
+ 
+  .block:not(.vertical):hover {
     transform: translateY(-3px) scaleY(1.04);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    border-color: rgba(255,255,255,0.5);
     z-index: 10;
   }
-  .block:hover::before { background: rgba(255,255,255,0.08); }
-
-  .block.active {
+  .block:hover::before { background: rgba(255,255,255,0.1); }
+ 
+  .block:not(.vertical).active {
     border-color: #fff;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.3), 0 8px 28px rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.2), 0 8px 28px rgba(0,0,0,0.3);
     z-index: 20;
     transform: translateY(-4px) scaleY(1.06);
   }
-
+ 
   /* colour families */
   .era-prehistoric { background: linear-gradient(135deg,#5c4f34,#7a6b4a); color: #f0e8d0; }
   .era-ancient      { background: linear-gradient(135deg,#7a4a30,#c47d5a); color: #fde8d8; }
@@ -162,7 +190,7 @@
   .era-contemporary { background: linear-gradient(135deg,#1a5a4a,#4a8a7a); color: #d0f0e8; }
   .era-axis         { background: transparent; color: var(--muted); font-size: 0.65rem; border: none !important; cursor: default !important; }
   .era-axis:hover   { transform: none !important; box-shadow: none !important; }
-
+ 
   /* ── AXIS ─────────────────────────────────────────────── */
   .axis-row {
     display: flex;
@@ -172,7 +200,7 @@
     border-top: 2px solid #555;
     margin-top: 6px;
   }
-
+ 
   .axis-tick {
     flex-shrink: 0;
     display: flex;
@@ -186,9 +214,9 @@
     padding-left: 5px;
     letter-spacing: 0.01em;
   }
-
+ 
   /* ── MODAL ─────────────────────────────────────────────── */
-
+ 
   .modal {
     background: #fff;
     border: 1px solid #ddd;
@@ -200,17 +228,17 @@
     box-shadow: 0 32px 80px rgba(0,0,0,0.22);
     animation: modalIn 0.25s cubic-bezier(.34,1.4,.64,1) both;
   }
-
+ 
   @keyframes modalIn {
     from { opacity:0; transform: scale(0.88) translateY(20px); }
     to   { opacity:1; transform: scale(1) translateY(0); }
   }
-
+ 
   .modal-header {
     padding: 1.6rem 1.8rem 1.2rem;
     position: relative;
   }
-
+ 
   .modal-era-badge {
     font-size: 0.65rem;
     font-weight: 700;
@@ -219,7 +247,7 @@
     opacity: 0.75;
     margin-bottom: 0.4rem;
   }
-
+ 
   .modal-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.9rem;
@@ -227,13 +255,13 @@
     line-height: 1.15;
     margin-bottom: 0.25rem;
   }
-
+ 
   .modal-period {
     font-size: 0.8rem;
     color: rgba(255,255,255,0.5);
     font-weight: 300;
   }
-
+ 
   .modal-close {
     position: absolute;
     top: 1.2rem; right: 1.4rem;
@@ -247,21 +275,21 @@
     transition: background 0.15s;
   }
   .modal-close:hover { background: rgba(255,255,255,0.18); }
-
+ 
   .modal-body {
     padding: 0 1.8rem 1.8rem;
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
   }
-
+ 
   .modal-desc {
     font-size: 0.95rem;
     line-height: 1.7;
     color: #333;
     font-weight: 300;
   }
-
+ 
   .modal-section-title {
     font-size: 0.65rem;
     font-weight: 700;
@@ -270,13 +298,13 @@
     color: var(--accent);
     margin-bottom: 0.35rem;
   }
-
+ 
   .modal-features {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
   }
-
+ 
   .feature-tag {
     background: #f5f0e8;
     border: 1px solid #ddd;
@@ -285,7 +313,7 @@
     font-size: 0.78rem;
     color: #444;
   }
-
+ 
   .modal-artwork {
     background: #f8f6f0;
     border: 1px solid #e0d8c8;
@@ -295,13 +323,13 @@
     gap: 1rem;
     align-items: flex-start;
   }
-
+ 
   .artwork-icon {
     font-size: 2rem;
     line-height: 1;
     flex-shrink: 0;
   }
-
+ 
   .artwork-info strong {
     display: block;
     font-family: 'Playfair Display', serif;
@@ -314,7 +342,7 @@
     font-size: 0.8rem;
     color: #777;
   }
-
+ 
   /* ── LEGEND ─────────────────────────────────────────── */
   .legend {
     display: flex;
@@ -326,7 +354,7 @@
     font-size: 0.72rem;
     color: #555;
   }
-
+ 
   .modal-close {
     position: absolute;
     top: 1.2rem; right: 1.4rem;
@@ -340,7 +368,7 @@
     transition: background 0.15s;
   }
   .modal-close:hover { background: rgba(0,0,0,0.16); }
-
+ 
   .modal-backdrop {
     display: none;
     position: fixed;
@@ -353,19 +381,19 @@
     padding: 1rem;
   }
   .modal-backdrop.open { display: flex; }
-
+ 
   .legend-item {
     display: flex;
     align-items: center;
     gap: 6px;
   }
-
+ 
   .legend-dot {
     width: 10px; height: 10px;
     border-radius: 3px;
     flex-shrink: 0;
   }
-
+ 
   .hint {
     text-align: center;
     font-size: 0.78rem;
@@ -376,20 +404,20 @@
 </style>
 </head>
 <body>
-
+ 
 <header>
-  <h1>Mākslas Stilu Laika Josla</h1>
+  <h1>Mākslas stilu laika josla</h1>
   <p>Klikšķini uz jebkura laikmeta vai stila, lai uzzinātu vairāk · Ritini horizontāli, lai pārvietotos pa vēsturi</p>
 </header>
-
+ 
 <div class="timeline-outer" id="timelineOuter">
   <div class="timeline-canvas" id="timelineCanvas">
     <!-- rows injected by JS -->
   </div>
 </div>
-
+ 
 <p class="hint">☞ Spied uz jebkura bloka · Velc, lai ritinātu</p>
-
+ 
 <div class="legend">
   <div class="legend-item"><div class="legend-dot" style="background:#7a6b4a"></div>Aizvēsture</div>
   <div class="legend-item"><div class="legend-dot" style="background:#c47d5a"></div>Senā pasaule</div>
@@ -400,7 +428,7 @@
   <div class="legend-item"><div class="legend-dot" style="background:#5a7aaa"></div>19. gs. stili</div>
   <div class="legend-item"><div class="legend-dot" style="background:#4a8a7a"></div>Modernisms / Laikmetīgā</div>
 </div>
-
+ 
 <!-- MODAL -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal" id="modal">
@@ -426,7 +454,7 @@
     </div>
   </div>
 </div>
-
+ 
 <script>
 /* ═══════════════════════════════════════════════
    DATA
@@ -766,15 +794,15 @@ const DATA = {
     artwork: "💡", artworkTitle: "Viena un trīs krēsli", artworkAuthor: "Džozefs Kosuts, 1965 · Ņujorka, MoMA"
   }
 };
-
+ 
 /* ═══════════════════════════════════════════════
    TIMELINE LAYOUT  (key = DATA key, w = relative width units, row 0..N)
 ═══════════════════════════════════════════════ */
-
+ 
 // Each row is an array of {key, w} objects.
 // Total width = 2800px across ~280 units
 const U = 10; // px per unit
-
+ 
 const ROWS = [
   // Row 0 – Antīkā josla (wide span)
   [
@@ -861,7 +889,7 @@ const ROWS = [
     { key:null, label:'', w:202, color:'era-axis' },
   ],
 ];
-
+ 
 // Axis ticks: {label, pos (units from left)}
 const TICKS = [
   {label:'600 000 g.', pos:0},{label:'40 000', pos:3},{label:'10 000', pos:5},
@@ -873,35 +901,51 @@ const TICKS = [
   {label:'XVIII gs.', pos:90},{label:'XIX gs.', pos:110},{label:'XX gs.', pos:140},
   {label:'XXI gs.', pos:200},
 ];
-
+ 
 /* ═══════════════════════════════════════════════
    BUILD TIMELINE
 ═══════════════════════════════════════════════ */
 const canvas = document.getElementById('timelineCanvas');
-
-ROWS.forEach(rowDef => {
+ 
+// First two rows are wide label rows (shorter height)
+ROWS.forEach((rowDef, rowIdx) => {
   const rowEl = document.createElement('div');
-  rowEl.className = 'row';
+  let cls = 'row';
+  if (rowIdx < 2) cls += ' wide-row';
+  if (rowIdx === 4) cls += ' style-row'; // main styles row needs height for vertical text
+  rowEl.className = cls;
   rowDef.forEach(block => {
     const el = document.createElement('div');
     el.className = 'block ' + block.color;
-    el.style.width = (block.w * U) + 'px';
-    el.style.minWidth = (block.w * U) + 'px';
+    const blockPx = block.w * U;
+    el.style.width = blockPx + 'px';
+    el.style.minWidth = blockPx + 'px';
     if (block.key) {
       el.textContent = block.label;
       el.dataset.key = block.key;
+      el.dataset.blockpx = blockPx;
       el.addEventListener('click', () => openModal(block.key, el));
     }
     rowEl.appendChild(el);
   });
   canvas.appendChild(rowEl);
 });
-
+ 
+// After render: mark narrow blocks as vertical
+requestAnimationFrame(() => {
+  document.querySelectorAll('.block[data-key]').forEach(el => {
+    const blockPx = parseInt(el.dataset.blockpx);
+    // if block is narrower than ~80px, use vertical text
+    if (blockPx < 80) {
+      el.classList.add('vertical');
+    }
+  });
+});
+ 
 // Axis row
 const axisRow = document.createElement('div');
 axisRow.className = 'axis-row';
 axisRow.style.minWidth = (280 * U) + 'px';
-// We'll render ticks as absolutely positioned; simpler: just flex with spacers
 let prev = 0;
 TICKS.forEach(t => {
   const spacer = document.createElement('div');
@@ -917,12 +961,13 @@ TICKS.forEach(t => {
   prev = t.pos;
 });
 canvas.appendChild(axisRow);
-
+ 
 /* ═══════════════════════════════════════════════
-   DRAG TO SCROLL
+   DRAG TO SCROLL (mouse + touch)
 ═══════════════════════════════════════════════ */
 const outer = document.getElementById('timelineOuter');
 let isDragging = false, startX, scrollLeft;
+ 
 outer.addEventListener('mousedown', e => {
   isDragging = true; startX = e.pageX - outer.offsetLeft; scrollLeft = outer.scrollLeft;
 });
@@ -933,23 +978,33 @@ outer.addEventListener('mousemove', e => {
   const x = e.pageX - outer.offsetLeft;
   outer.scrollLeft = scrollLeft - (x - startX);
 });
-
+ 
+// Touch support
+outer.addEventListener('touchstart', e => {
+  startX = e.touches[0].pageX; scrollLeft = outer.scrollLeft;
+}, { passive: true });
+outer.addEventListener('touchmove', e => {
+  const dx = e.touches[0].pageX - startX;
+  outer.scrollLeft = scrollLeft - dx;
+}, { passive: true });
+ 
+ 
 /* ═══════════════════════════════════════════════
    MODAL
 ═══════════════════════════════════════════════ */
 function openModal(key, el) {
   const d = DATA[key];
   if (!d) return;
-
+ 
   // de-activate previous
   document.querySelectorAll('.block.active').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-
+ 
   document.getElementById('modalEra').textContent = d.era;
   document.getElementById('modalTitle').textContent = d.title;
   document.getElementById('modalPeriod').textContent = d.period;
   document.getElementById('modalDesc').textContent = d.desc;
-
+ 
   const feats = document.getElementById('modalFeatures');
   feats.innerHTML = '';
   d.features.forEach(f => {
@@ -958,11 +1013,11 @@ function openModal(key, el) {
     tag.textContent = f;
     feats.appendChild(tag);
   });
-
+ 
   document.getElementById('artworkIcon').textContent = d.artwork;
   document.getElementById('artworkTitle').textContent = d.artworkTitle;
   document.getElementById('artworkAuthor').textContent = d.artworkAuthor;
-
+ 
   // colour header to match block
   const hdr = document.getElementById('modalHeader');
   const colorMap = {
@@ -981,16 +1036,16 @@ function openModal(key, el) {
   const bc = document.querySelector(`.block[data-key="${key}"]`);
   let cls = [...bc.classList].find(c => c.startsWith('era-') && c !== 'era-axis');
   hdr.style.background = colorMap[cls] || '#1a1825';
-
+ 
   document.getElementById('modalBackdrop').classList.add('open');
 }
-
+ 
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('modalBackdrop').addEventListener('click', e => {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
+ 
 function closeModal() {
   document.getElementById('modalBackdrop').classList.remove('open');
   document.querySelectorAll('.block.active').forEach(b => b.classList.remove('active'));
