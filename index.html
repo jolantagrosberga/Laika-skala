@@ -20,15 +20,25 @@
     width: 100%;
     overflow: hidden;
     font-family: 'Source Sans 3', sans-serif;
-    background: #fff;
+    background: #f5f3ee;
     color: var(--text);
-    display: flex;
-    flex-direction: column;
   }
+  #app {
+    position: absolute; top: 0; left: 0; width: 1600px; height: 900px;
+    transform-origin: 0 0; overflow: hidden; background: #fff;
+    display: flex; flex-direction: column;
+  }
+  #fsBtn {
+    position: absolute; right: 24px; top: 50%; transform: translateY(-50%);
+    font-family: 'Source Sans 3', sans-serif; font-weight: 600; font-size: 16px;
+    background: #fff; color: #3a2800; border: 2px solid var(--accent); border-radius: 999px;
+    padding: 9px 18px; cursor: pointer; transition: background .15s, color .15s;
+  }
+  #fsBtn:hover { background: var(--accent); color: #fff; }
  
   header {
     flex-shrink: 0;
-    padding: 0.9rem 2rem 0.7rem;
+    padding: 16px 2rem 12px;
     text-align: center;
     background: #fff;
     border-bottom: 2px solid #e0d8c8;
@@ -43,19 +53,19 @@
   }
   header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+    font-size: 34px;
     color: #3a2800;
     letter-spacing: 0.03em;
     margin-bottom: 0.15rem;
   }
-  header p { color: var(--muted); font-size: 0.82rem; font-weight: 300; }
+  header p { color: var(--muted); font-size: 16px; font-weight: 300; }
  
   /* Timeline aizpilda visu brīvo vietu starp header un leģendu */
   .timeline-outer {
     flex: 1 1 auto;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 0.8rem 1.2rem 0.4rem;
+    padding: 16px 20px 8px;
     cursor: grab;
     user-select: none;
     scrollbar-width: thin;
@@ -66,23 +76,10 @@
   .timeline-outer::-webkit-scrollbar-track { background: #e8e8e8; }
   .timeline-outer::-webkit-scrollbar-thumb { background: #b07d2a; border-radius: 3px; }
  
-  .timeline-canvas {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 2800px;
-    height: 100%;
-  }
- 
-  /* ROWS */
-  .row {
-    display: flex;
-    align-items: stretch;
-    height: 46px;
-    gap: 3px;
-  }
-  .row.wide-row  { height: 30px; }
-  .row.style-row { height: 100px; }
+  .timeline-canvas { position: relative; height: 100%; }
+  .lane-area { position: absolute; top: 0; left: 0; right: 0; bottom: 52px; }
+  .grid-line { position: absolute; top: 0; bottom: -6px; width: 0; border-left: 1px dashed #d6cfbf; }
+  .grid-line.zero { border-left: 2px solid #b07d2a; }
  
   /* BLOCKS */
   .block {
@@ -91,7 +88,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 0.67rem;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -100,9 +97,20 @@
     transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
     padding: 3px 5px;
     line-height: 1.2;
-    position: relative;
     overflow: hidden;
-    flex-shrink: 0;
+    position: absolute;
+    white-space: nowrap;
+  }
+  .block .lbl { position: relative; z-index: 1; }
+  .block.wide-left { justify-content: flex-start; padding-left: 24px; }
+  .block.outlabel { overflow: visible; padding: 0; }
+  .block.outlabel .lbl {
+    position: absolute; left: calc(100% + 6px); top: 50%; transform: translateY(-50%);
+    color: #3a2800; text-shadow: 0 0 3px #fff, 0 0 3px #fff;
+  }
+  .block-measure {
+    position: absolute; visibility: hidden; white-space: nowrap;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
   }
   .block::before {
     content: '';
@@ -111,21 +119,8 @@
     background: rgba(255,255,255,0);
     transition: background 0.15s;
   }
-  .block.vertical {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    letter-spacing: 0.06em;
-    padding: 5px 3px;
-    font-size: 0.63rem;
-  }
-  .block:not(.vertical):hover {
-    transform: translateY(-2px) scaleY(1.03);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-    border-color: rgba(255,255,255,0.6);
-    z-index: 10;
-  }
-  .block.vertical:hover {
-    transform: translateX(-2px) scaleX(1.04);
+  .block:hover {
+    transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(0,0,0,0.18);
     border-color: rgba(255,255,255,0.6);
     z-index: 10;
@@ -153,54 +148,43 @@
   .era-axis:hover { transform: none !important; box-shadow: none !important; }
  
   /* AXIS */
-  .axis-row {
-    display: flex;
-    align-items: center;
-    height: 32px;
-    gap: 3px;
-    border-top: 2px solid #555;
-    margin-top: 4px;
-    flex-shrink: 0;
-  }
+  .axis { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; border-top: 2px solid #555; }
   .axis-tick {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #222;
-    border-left: 2px solid #888;
-    height: 100%;
-    padding-left: 4px;
+    position: absolute; top: 0; height: 100%;
+    border-left: 2px solid #888; padding: 4px 0 0 5px;
+    font-size: 14px; font-weight: 700; color: #222; line-height: 1.1; white-space: nowrap;
   }
+  .axis-tick small { display: block; font-size: 11px; font-weight: 600; color: #8a6a3a; }
+  .axis-tick.zero { border-left-color: #b07d2a; }
  
   /* HINT + LEGEND — fiksēti apakšā */
   .hint {
     flex-shrink: 0;
     text-align: center;
-    font-size: 0.72rem;
-    color: #999;
-    padding: 0.3rem 1rem 0.2rem;
+    font-size: 15px;
+    color: #888;
+    padding: 6px 1rem 6px;
     font-style: italic;
   }
   .legend {
     flex-shrink: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 5px 12px;
-    padding: 0.55rem 1.2rem;
+    gap: 6px 22px;
+    padding: 12px 24px;
+    justify-content: center;
     background: #f5f3ee;
     border-top: 1px solid #ddd;
-    font-size: 0.68rem;
+    font-size: 15px;
     color: #555;
   }
   .legend-item { display: flex; align-items: center; gap: 5px; }
-  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 2px; flex-shrink: 0; }
  
   /* MODAL */
   .modal-backdrop {
     display: none;
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(0,0,0,0.45);
     backdrop-filter: blur(4px);
@@ -214,12 +198,12 @@
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 16px;
-    max-width: 570px;
+    max-width: 760px;
     width: 100%;
     overflow: hidden;
     box-shadow: 0 32px 80px rgba(0,0,0,0.22);
     animation: modalIn 0.25s cubic-bezier(.34,1.4,.64,1) both;
-    max-height: 88vh;
+    max-height: 820px;
     display: flex;
     flex-direction: column;
   }
@@ -238,7 +222,7 @@
   }
   .modal-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.6rem; color: #fff; line-height: 1.15; margin-bottom: 0.15rem;
+    font-size: 2.1rem; color: #fff; line-height: 1.15; margin-bottom: 0.15rem;
   }
   .modal-period { font-size: 0.76rem; color: rgba(255,255,255,0.55); font-weight: 300; }
   .modal-close {
@@ -254,7 +238,7 @@
     overflow-y: auto;
     display: flex; flex-direction: column; gap: 0.9rem;
   }
-  .modal-desc { font-size: 0.91rem; line-height: 1.68; color: #333; font-weight: 300; }
+  .modal-desc { font-size: 1.05rem; line-height: 1.68; color: #333; font-weight: 300; }
   .modal-section-title {
     font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--accent); margin-bottom: 0.28rem;
@@ -272,11 +256,11 @@
   }
   .artwork-img-wrap {
     position: relative; cursor: zoom-in; overflow: hidden;
-    max-height: 200px; display: flex; align-items: center;
+    max-height: 300px; display: flex; align-items: center;
     justify-content: center; background: #e8e4dc;
   }
   .artwork-img-wrap img {
-    width: 100%; height: 200px; object-fit: cover;
+    width: 100%; height: 300px; object-fit: cover;
     display: block; transition: transform 0.3s;
   }
   .artwork-img-wrap:hover img { transform: scale(1.03); }
@@ -285,6 +269,7 @@
     background: rgba(0,0,0,0.5); color: #fff;
     font-size: 0.63rem; padding: 3px 8px; border-radius: 10px; pointer-events: none;
   }
+  .artwork-noimg { display: none; padding: 28px 20px; text-align: center; font-size: 14px; line-height: 1.45; color: #5a4a30; }
   .artwork-info { padding: 0.65rem 1rem; }
   .artwork-info strong {
     display: block; font-family: 'Playfair Display', serif;
@@ -294,13 +279,13 @@
  
   /* LIGHTBOX */
   .lightbox {
-    display: none; position: fixed; inset: 0;
+    display: none; position: absolute; inset: 0;
     background: rgba(0,0,0,0.92); z-index: 2000;
     align-items: center; justify-content: center; padding: 1rem;
   }
   .lightbox.open { display: flex; }
   .lightbox img {
-    max-width: 90vw; max-height: 88vh; object-fit: contain;
+    max-width: 1440px; max-height: 790px; object-fit: contain;
     border-radius: 4px; box-shadow: 0 8px 60px rgba(0,0,0,0.6);
     animation: lbIn 0.2s ease both;
   }
@@ -324,26 +309,30 @@
 </style>
 </head>
 <body>
+<div id="app">
  
 <header>
   <h1>Mākslas stilu laika josla</h1>
   <p>Spied uz jebkura laikmeta vai stila · Ritini horizontāli, lai pārvietotos pa vēsturi</p>
+  <button id="fsBtn" type="button">⛶ Atvērt pilnekrānu</button>
 </header>
  
 <div class="timeline-outer" id="timelineOuter">
   <div class="timeline-canvas" id="timelineCanvas"></div>
 </div>
  
-<p class="hint">☞ Spied uz jebkura bloka · Velc vai ritini, lai pārvietotos</p>
+<p class="hint">☞ Spied uz jebkura bloka · Velc vai ritini, lai pārvietotos · Mērogs nav vienmērīgs: senie laikmeti saspiesti, jaunākie – izstiepti</p>
  
 <div class="legend">
   <div class="legend-item"><div class="legend-dot" style="background:#7a6b4a"></div>Aizvēsture</div>
   <div class="legend-item"><div class="legend-dot" style="background:#c47d5a"></div>Senā pasaule</div>
   <div class="legend-item"><div class="legend-dot" style="background:#d4aa60"></div>Antīkā māksla</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#b87840"></div>Bizantija</div>
   <div class="legend-item"><div class="legend-dot" style="background:#6a8a6a"></div>Viduslaiki</div>
   <div class="legend-item"><div class="legend-dot" style="background:#5a8a9a"></div>Renesanse</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#8a6a9a"></div>Baroks / Klasicisms</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#5a7aaa"></div>19. gs. stili</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8a6a9a"></div>Baroks / Rokoko</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5a7aaa"></div>Klasicisms / Ampīrs</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#aa6a7a"></div>Romantisms / Reālisms</div>
   <div class="legend-item"><div class="legend-dot" style="background:#4a8a7a"></div>Modernisms / Laikmetīgā</div>
 </div>
  
@@ -365,7 +354,8 @@
       <div class="modal-artwork">
         <div class="artwork-img-wrap" id="artworkImgWrap">
           <img id="artworkImg" src="" alt="" loading="lazy">
-          <span class="artwork-zoom-hint">🔍 Spied, lai palielinātu</span>
+          <span class="artwork-zoom-hint" id="artworkZoomHint">🔍 Spied, lai palielinātu</span>
+          <div class="artwork-noimg" id="artworkNoImg">Šī darba attēls nav pieejams brīvi lietojamo attēlu krātuvē (autortiesību dēļ).<br>Darbu var aplūkot muzeja mājas lapā.</div>
         </div>
         <div class="artwork-info">
           <strong id="artworkTitle"></strong>
@@ -383,304 +373,749 @@
   <div class="lightbox-caption" id="lightboxCaption"></div>
 </div>
  
+</div>
 <script>
 const DATA = {
-  "akmens-laikmets": {
-    title:"Akmens laikmets", period:"ap 600 000 – 3000 g. p.m.ē.", era:"Aizvēsture", color:"era-prehistoric",
-    desc:"Cilvēces pirmie mākslinieciskie izpausmes – alu gleznojumi, reljefs un nelielas skulptūras. Māksla kalpoja maģiskiem un rituāliem mērķiem, attēlojot dzīvniekus un medību ainas.",
-    features:["Alu gleznojumi","Petroglifi","Vēneras figurīnas","Dabiskie pigmenti"],
-    artworkTitle:"Altamiras alu gleznojumi", artworkAuthor:"ap 36 000 g. p.m.ē. · Spānija",
-    img:"9_Bisonte_Magdaleniense_polícromo.jpg",
-    imgFile:"AltamiraBison.jpg"
-  },
-  "bronzas-laikmets": {
-    title:"Bronzas laikmets", period:"ap 3000 – 800 g. p.m.ē.", era:"Aizvēsture", color:"era-prehistoric",
-    desc:"Parādās pirmās civilizācijas – Ēģipte, Mezopotāmija. Metāla apstrāde ļauj radīt sarežģītākus priekšmetus. Māksla kļūst reprezentatīva un saistīta ar varu.",
-    features:["Bronzas lējumi","Rotaslietas","Reljefs","Rituālie trauki"],
-    artworkTitle:"Nebras debess disks", artworkAuthor:"ap 1600 g. p.m.ē. · Halle, Vācija",
-    img:"Nebra_Scheibe.jpg",
-    imgFile:"Nebra_Scheibe.jpg"
-  },
-  "dzelzs-laikmets": {
-    title:"Dzelzs laikmets", period:"ap 800 – 1. g. p.m.ē.", era:"Aizvēsture", color:"era-prehistoric",
-    desc:"Dzelzs rīku un ieroču izplatīšanās. Eiropas ķeltu un ģermāņu tautu ornamentālā māksla – sarežģīti interlace motīvi, dzīvnieku stils.",
-    features:["Ķeltu ornaments","Saktas un diadēmas","Dzīvnieku stils","Interlace"],
-    artworkTitle:"Battersea vairogs", artworkAuthor:"ap 350–50 g. p.m.ē. · Britu muzejs, Londona",
-    img:"Battersea_Shield.jpg",
-    imgFile:"Battersea_Shield.jpg"
-  },
-  "mezopotamija": {
-    title:"Mezopotāmijas māksla", period:"ap 3500 – 500 g. p.m.ē.", era:"Senā pasaule", color:"era-ancient",
-    desc:"Starp Tigru un Eifrata upēm dzimušā civilizācija – šumeri, babilonieši, asīrieši – radīja grandiozas celtnes, reljefus un rakstu mākslu. Māksla kalpoja valdnieka un dievu pagodināšanai.",
-    features:["Zikurāti","Ķīļraksts","Karaļu reljefs","Fajanss un lapis lazuli"],
-    artworkTitle:"Hammurabi kodekss", artworkAuthor:"ap 1754 g. p.m.ē. · Luvra, Parīze",
-    img:"P1050763_Louvre_code_Hammurabi_face_rwk.JPG",
-    imgFile:"P1050763_Louvre_code_Hammurabi_face_rwk.JPG"
-  },
-  "egipte": {
-    title:"Senās Ēģiptes māksla", period:"ap 3000 – 30 g. p.m.ē.", era:"Senā pasaule", color:"era-ancient",
-    desc:"Ēģiptes māksla bija stingri kanoniska – figūras attēlotas pēc noteiktiem proporciju likumiem. Visa māksla kalpoja mūžības idejai – piramīdas, tempļi un mumifikācija.",
-    features:["Frontāla pozīcija","Hieratiskais mērogs","Hieroglifi","Monumentalitāte"],
-    artworkTitle:"Nefertites biste", artworkAuthor:"ap 1345 g. p.m.ē. · Berlīnes Ēģiptes muzejs",
-    img:"Nofretete_Neues_Museum.jpg",
-    imgFile:"Nofretete_Neues_Museum.jpg"
-  },
-  "pirmatneja": {
-    title:"Pirmatnējā māksla", period:"dažādos reģionos dažādos laikos", era:"Aizvēsture", color:"era-prehistoric",
-    desc:"Tradicionālās kultūras un cilšu sabiedrību vizuālā izteiksme. Ietver Āfrikas, Okeānijas, Amerikas un citu reģionu pirmiedzīvotāju mākslu – totemismus, rituālās maskas, keramiku.",
-    features:["Totēmi","Rituālās maskas","Ķermeņa māksla","Keramika"],
-    artworkTitle:"Lieldienu salas moai statuja", artworkAuthor:"ap 1400–1650 · Čīle",
-    img:"Moai_Rano_raraku.jpg",
-    imgFile:"Moai_Rano_raraku.jpg"
-  },
-  "kristietibas-sakums": {
-    title:"Kristietības sākums", period:"1. – 4. gs.", era:"Viduslaiki", color:"era-medieval",
-    desc:"Agrīnās kristietības simboliskā māksla katakombās un bazīlikās. Kristus un apustuļu attēli, simboli (zivs, jērs, krusts). Māksla kalpo ticības mācīšanai.",
-    features:["Simbolisms","Freski katakombās","Mozaīkas","Bazīlikas"],
-    artworkTitle:"Kristus kā Labais Gans", artworkAuthor:"3. gs. · Romas katakomba",
-    img:"Good_shepherd_catacomb_of_priscilla.jpg",
-    imgFile:"Good_shepherd_catacomb_of_priscilla.jpg"
-  },
-  "antika": {
-    title:"Antīkā māksla", period:"ap 800 g. p.m.ē. – 5. gs. m.ē.", era:"Antīkā pasaule", color:"era-antique",
-    desc:"Senās Grieķijas un Romas māksla, kas izstrādāja ideālo cilvēka proporciju kanonu. Demokrātija un filozofija ietekmēja harmonijas, skaistuma un racionālisma principus.",
-    features:["Ideāla proporcija","Marmora skulptūra","Perspektīva","Kolonnādes"],
-    artworkTitle:"Venera no Milovas (Afrodīte)", artworkAuthor:"ap 150 g. p.m.ē. · Luvra, Parīze",
-    img:"AGMA_Aphrodite_of_Milos.jpg",
-    imgFile:"Venus_de_Milo_Louvre_Ma399.jpg"
-  },
-  "sena-griekija": {
-    title:"Senās Grieķijas māksla", period:"ap 800 – 31 g. p.m.ē.", era:"Antīkā pasaule", color:"era-antique",
-    desc:"Grieķu māksla evolucionēja no ģeometriskiem motīviem uz idealizētu reālismu. Trīs arhitektūras ordeņi – doriešu, jonijas, korintijas – un skulptūra, kas slavē cilvēka ķermeņa skaistumu.",
-    features:["Trīs ordeņi","Sarkanfigūru keramika","Mitoloģija","Ideālais ķermenis"],
-    artworkTitle:"Atēnas Partenons", artworkAuthor:"447–438 g. p.m.ē. · Atēnas",
-    img:"The_Parthenon_in_Athens.jpg",
-    imgFile:"The_Parthenon_in_Athens.jpg"
-  },
-  "sena-roma": {
-    title:"Senās Romas māksla", period:"ap 500 g. p.m.ē. – 476 m.ē.", era:"Antīkā pasaule", color:"era-antique",
-    desc:"Roma pārņēma grieķu tradīcijas, pievienojot praktisku monumentalitāti. Lieliskas inženierbūves – kolizejs, akvedukti, ceļi. Portrets kā reālistisks attēls.",
-    features:["Portreta skulptūra","Triumfa arkas","Freskas","Mozaīkas"],
-    artworkTitle:"Kolizejs", artworkAuthor:"70–80 m.ē. · Roma",
-    img:"Colosseo_2020.jpg",
-    imgFile:"Colosseo_2020.jpg"
-  },
-  "viduslaiki": {
-    title:"Viduslaiku māksla", period:"5. – 15. gs.", era:"Viduslaiki", color:"era-medieval",
-    desc:"Viduslaiku Eiropas māksla bija pakārtota Baznīcas mācībai – glezniecība, tēlniecība un arhitektūra kalpoja dievbijībai. Iluminētās rokraksta grāmatas un katedrāļu celtniecība.",
-    features:["Reliģisks saturs","Zelta fons","Hieratiskums","Vitrāži"],
-    artworkTitle:"Šartras katedrāle", artworkAuthor:"12.–13. gs. · Francija",
-    img:"Chartres_Cathedral_000.JPG",
-    imgFile:"Chartres_Cathedral_000.JPG"
-  },
-  "bizantija": {
-    title:"Bizantijas māksla", period:"4. – 15. gs.", era:"Viduslaiki", color:"era-byzantine",
-    desc:"Austrumromas impērijas reliģiozā māksla ar ikonogrāfiju kā galveno žanru. Bagātīgas mozaīkas, zelta foni un stingri kanonizēti tēlu attēlojumi.",
-    features:["Ikonas","Mozaīkas","Zelta fons","Gaismas simbolisms"],
-    artworkTitle:"Kristus Pantokrators mozaīka", artworkAuthor:"12. gs. · Palermo, Sicīlija",
-    img:"Christ_Pantocrator_Cefalù.jpg",
-    imgFile:"Hagia_Sophia_Deesis_mosaic2.jpg"
-  },
-  "eiropasvidu": {
-    title:"Eiropas viduslaiku māksla", period:"8. – 13. gs.", era:"Viduslaiki", color:"era-medieval",
-    desc:"Karolingas un Otonijas renesanse, iluminētās Bībeles un psaltīri. Monumentālas fresku programmas baznīcās – māksla kā Rakstu grāmata analfabētiem.",
-    features:["Fresku cikli","Iluminētas grāmatas","Kapiteli","Tapiserijas"],
-    artworkTitle:"Kella grāmata (lappuse)", artworkAuthor:"ap 800. g. · Dublina, Trīsvienības kolēdža",
-    img:"KellsFol032vChiRhoMonogram.jpg",
-    imgFile:"KellsFol034rChristEnthroned.jpg"
-  },
-  "agrinie-viduslaiki": {
-    title:"Agrīnie viduslaiki", period:"4. – 10. gs.", era:"Viduslaiki", color:"era-medieval",
-    desc:"Tautu migrācijas periods – ģermāņu, vikingu un ķeltu māksla savijās ar kristīgajiem motīviem. Interlace ornaments un zeltzedzenē raksturīgi.",
-    features:["Interlace ornaments","Dzīvnieku stils","Zeltzedenē","Vikingu māksla"],
-    artworkTitle:"Sutton Hū ķivere", artworkAuthor:"ap 625. g. · Britu muzejs, Londona",
-    img:"Sutton_Hoo_helmet_2016.jpg",
-    imgFile:"Sutton_Hoo_helmet_2016.jpg"
-  },
-  "romanika": {
-    title:"Romānika", period:"10. – 13. gs.", era:"Viduslaiki", color:"era-medieval",
-    desc:"Pirmais paneiropas mākslas stils – masīvas akmens celtnes ar pusloka arku. Baznīcas kalpoja kā ceļotāju svētvieta un garīgais centrs.",
-    features:["Pusloka arkas","Masīvas sienas","Tympani reljefi","Kolumnu rindas"],
-    artworkTitle:"Vezelē bazilika – tympans", artworkAuthor:"12. gs. · Francija",
-    img:"Vezelay_Basilique_Madeleine_Tympan_narthex_250608_03.jpg",
-    imgFile:"Vezelay_Basilique_Madeleine_Tympan_narthex_250608_03.jpg"
-  },
-  "gotika": {
-    title:"Gotika", period:"12. – 15. gs.", era:"Viduslaiki", color:"era-medieval",
-    desc:"Gotika centās uz augšu – smailās arkas, augsti torņi un gaismu caurlaidīgas vitrāžu sienas. Smailā arka ļāva sienas darīt plānākas, aizpildot tās ar krāsainiem stikliem.",
-    features:["Smailā arka","Vitrāži","Kontrafori","Gaismainums"],
-    artworkTitle:"Parīzes Dievmātes katedrāle", artworkAuthor:"1163–1345 · Parīze",
-    img:"Notre-Dame de Paris, 4 October 2017.jpg",
-    imgFile:"Notre-Dame_de_Paris_2013-07-24.jpg"
-  },
-  "renesanse": {
-    title:"Renesanse", period:"14. – 16. gs.", era:"Renesanse", color:"era-renaissance",
-    desc:"Atdzimšana – atgriešanās pie antīkajiem ideāliem, cilvēks kā visuma centrs. Humānisms, lineārā perspektīva, reālistiska anatomija. Leonardo, Mikelandželo, Rafaels.",
-    features:["Lineārā perspektīva","Humānisms","Sfumato","Reālistiska anatomija"],
-    artworkTitle:"Mona Liza", artworkAuthor:"Leonardo da Vinči, 1503–1519 · Luvra, Parīze",
-    img:"Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg",
-    imgFile:"Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg"
-  },
-  "manierisums": {
-    title:"Manierisums", period:"16. gs.", era:"Renesanse", color:"era-renaissance",
-    desc:"Renesanses vēlīnā fāze – apzināta novirze no harmonijas, izstieptas proporcijas, sarežģītas pozas. Mākslinieki eksperimentēja ar krāsu un telpas izkropļojumiem.",
-    features:["Figura serpentinata","Izstieptas proporcijas","Izdomātas krāsas","Sarežģītas kompozīcijas"],
-    artworkTitle:"Madonna ar garo kaklu", artworkAuthor:"Parmidžanīno, 1534–1540 · Florence",
-    img:"Parmigianino - Madonna dal collo lungo.jpg",
-    imgFile:"Parmigianino_-_Madonna_dal_collo_lungo.jpg"
-  },
-  "baroks": {
-    title:"Baroks", period:"17. – 18. gs. sākums", era:"Baroks", color:"era-baroque",
-    desc:"Dramatisms, kustība un emocijas – baroks radās kā Reformācijas atbilde. Intensīva gaismas un ēnas spēle (chiaroscuro), bagātīga dekorativitāte. Karavadžo, Rembrants, Bernīni.",
-    features:["Chiaroscuro","Dramatisms","Kustīgums","Tenebrisms"],
-    artworkTitle:"Svētā Mateja aicinājums", artworkAuthor:"Karavadžo, 1600 · Roma",
-    img:"The_Calling_of_Saint_Matthew-Caravaggo_(1599-1600).jpg",
-    imgFile:"The_Calling_of_Saint_Matthew-Caravaggo_(1599-1600).jpg"
-  },
-  "rokokko": {
-    title:"Rokoko", period:"18. gs.", era:"Baroks", color:"era-baroque",
-    desc:"Elegants, rotaļīgs un dekoratīvs stils, kas attīstījās Francijas galmā. Gaišas krāsas, vijīgas formas, mīlas un pastorālās ainas. Fragonārs, Vatō.",
-    features:["Pasteļkrāsas","S-formas līknes","Galma elegance","Pastorālās ainas"],
-    artworkTitle:"Šūpoles", artworkAuthor:"Žans Onorē Fragonārs, 1767 · Londona",
-    img:"Fragonard, The Swing.jpg",
-    imgFile:"Fragonard,_The_Swing.jpg"
-  },
-  "realisums": {
-    title:"Reālisms", period:"17. gs. un 19. gs.", era:"Baroks", color:"era-baroque",
-    desc:"Patiesīgs ikdienas dzīves attēlojums – zemnieki, strādnieki, tirgus ainas. Nīderlandes zelta laikmets (Vermērs, Rembrands); Franču reālisms ar Kurbē.",
-    features:["Ikdienas motīvi","Gaismas studija","Tūlītējs skatījums","Sociālā kritika"],
-    artworkTitle:"Meitene ar pērļu auskaru", artworkAuthor:"Jans Vermērs, ap 1665 · Hāga",
-    img:"1665 Girl with a Pearl Earring.jpg",
-    imgFile:"1665_Girl_with_a_Pearl_Earring.jpg"
-  },
-  "klasicisms": {
-    title:"Klasicisms", period:"17. – 19. gs.", era:"Klasicisms", color:"era-classical",
-    desc:"Atgriešanās pie antīkajiem ideāliem – sakārtotība, skaidrība, normas. Francijā uzplauka kā valsts stils. Arhitektūrā – simetrija, kolonnas, frontoni.",
-    features:["Antīkie motīvi","Simetrija","Normas un kārtība","Varonīgi sižeti"],
-    artworkTitle:"Versaļas pils un dārzi", artworkAuthor:"1661–1710 · Francija",
-    img:"Palace of Versailles, view from the Gardens.jpg",
-    imgFile:"Palace_of_Versailles_Gardens_13.JPG"
-  },
-  "ampirs": {
-    title:"Ampīrs", period:"ap 1800–1830", era:"Klasicisms", color:"era-classical",
-    desc:"Napoleona impērijas stils – monumentāls neoklasicisms ar ēģiptiešu un romiešu motīviem. Varenums, triumfs, imperatoriskā simbolika.",
-    features:["Imperatoriskā simbolika","Ēģiptiešu motīvi","Tumšas koksnes","Bronzas dekors"],
-    artworkTitle:"Napoleona kronēšana", artworkAuthor:"Žaks Luī Davids, 1805–1807 · Luvra",
-    img:"Jacques-Louis David - The Coronation of Napoleon (1805-1807).jpg",
-    imgFile:"Jacques-Louis_David_-_The_Coronation_of_Napoleon_(1805-1807).jpg"
-  },
-  "romantisms": {
-    title:"Romantisms", period:"18. gs. beigas – 19. gs. vidus", era:"Romantisms", color:"era-romantic",
-    desc:"Emocijas pret prātu, daba pret pilsētu, eksotika un pagātne. Romantisms protestēja pret industriālo revolūciju, slavinot tautas garu un personiskās izjūtas.",
-    features:["Emocionalitāte","Dabas grandiosums","Eksotika","Tautas eposs"],
-    artworkTitle:"Brīvība ved tautu", artworkAuthor:"Ežēns Delakruā, 1830 · Luvra, Parīze",
-    img:"Eugène Delacroix - La liberté guidant le peuple.jpg",
-    imgFile:"Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg"
-  },
-  "simbolisms": {
-    title:"Simbolisms", period:"ap 1880–1910", era:"Romantisms", color:"era-romantic",
-    desc:"Simbolisti pretojās materiālismam, meklējot dziļāku, mistisko patiesību. Sapņi, mīti, nāve un maņu kārdināšana. Klimts, Moreau, Redons.",
-    features:["Misticisms","Sapņainums","Mitoloģija","Jutekliskums"],
-    artworkTitle:"Skūpsts", artworkAuthor:"Gustavs Klimts, 1907–1908 · Vīne, Belvedere",
-    img:"The Kiss - Gustav Klimt - Google Cultural Institute.jpg",
-    imgFile:"The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg"
-  },
-  "impresionisms": {
-    title:"Impresionisms", period:"ap 1860–1900", era:"Modernisms", color:"era-modern",
-    desc:"Impresionisti glezno brīvā dabā, tverdami gaismas un gaisa efektus. Krāsa vairs nav precīza, bet atstāj iespaidu. Monet, Renoirs, Pizarro, Degā.",
-    features:["Gaismas efekti","Āra gleznošana","Redzamie triepieni","Kustīgums"],
-    artworkTitle:"Ūdensrozītes", artworkAuthor:"Klods Monē, 1906 · Čikāga",
-    img:"Claude Monet - Water Lilies - 1906, Ryerson.jpg",
-    imgFile:"Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg"
-  },
-  "postimpresionisms": {
-    title:"Postimpresionisms", period:"ap 1880–1910", era:"Modernisms", color:"era-modern",
-    desc:"Impresionisma pārveidošana – katrs mākslinieks devās savā virzienā. Sezāns pētīja ģeometriskās formas, Van Gogs – emocijas caur krāsu, Gogēns – primitīvismu.",
-    features:["Strukturalizācija","Emocionālā krāsa","Primitīvisms","Punktisms"],
-    artworkTitle:"Saulespuķes", artworkAuthor:"Vincents van Gogs, 1888 · Londona",
-    img:"Vincent van Gogh - Sunflowers (1888, National Gallery London).jpg",
-    imgFile:"Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg"
-  },
-  "jugendstils": {
-    title:"Jūgendstils / Art Nouveau", period:"ap 1890–1910", era:"Modernisms", color:"era-modern",
-    desc:"Visas mākslas apvienošana vienā – arhitektūra, mēbeles, plakāts, tekstils. Organiskās formas, vijīgas līnijas, augu un dzīvnieku motīvi. Klimts, Muha, Gaudi.",
-    features:["Organiskās formas","Vijīgas līnijas","Dekoratīvisms","Augu motīvi"],
-    artworkTitle:"Alfons Muha – plakāts Gismonda", artworkAuthor:"Alfons Muha, 1895",
-    img:"Alfons Mucha - 1895 - Gismonda.jpg",
-    imgFile:"Mucha-Gismonda.jpg"
-  },
-  "ekspresionisms": {
-    title:"Ekspresionisms", period:"ap 1905–1925", era:"Modernisms", color:"era-modern",
-    desc:"Iekšējās emocionālās patiesības pārnese gleznā – deformācija, spilgtas krāsas, nemiers. Bieži atspoguļo modernitātes trauksmi un sociālo kritiku.",
-    features:["Deformācija","Spilgtas krāsas","Nemiers","Emocionālā patiesība"],
-    artworkTitle:"Sauciens", artworkAuthor:"Edvards Munks, 1893 · Oslo",
-    img:"Edvard Munch, 1893, The Scream, oil, tempera and pastel on cardboard, 91 x 73 cm, National Gallery of Norway.jpg",
-    imgFile:"The_Scream_by_Edvard_Munch,_1893_-_Nasjonalgalleriet.png"
-  },
-  "fovisms": {
-    title:"Fovisms", period:"ap 1905–1910", era:"Modernisms", color:"era-modern",
-    desc:"\"Mežonīgo zvēru\" krāsu eksplosija – krāsa vairs nav reālistiska, bet ir emocionāla un autonoma. Matiss un Dereins izmantoja tīras, spilgtas krāsas.",
-    features:["Tīras krāsas","Krāsas autonomija","Vienkāršotas formas","Prieks"],
-    artworkTitle:"Deja", artworkAuthor:"Anrī Matiss, 1910 · Sanktpēterburga, Ermitāža",
-    img:"Dance (I) by Henri Matisse.jpg",
-    imgFile:"Matisse_-_Dance_(first_version)_-_MoMA.jpg"
-  },
-  "kubisms": {
-    title:"Kubisms", period:"ap 1907–1920", era:"Modernisms", color:"era-modern",
-    desc:"Pikaso un Braks sadrupa reālistisko skatu – objekti redzami no vairākiem skatpunktiem vienlaicīgi, ģeometrizēti. Kubisms radīja revolūciju divdimensiju attēlojumā.",
-    features:["Daudzie skatpunkti","Ģeometrizācija","Kolaža","Analītiskais kubisms"],
-    artworkTitle:"Avinjones dāmas", artworkAuthor:"Pablo Pikaso, 1907 · Ņujorka, MoMA",
-    img:"Les Demoiselles d'Avignon.jpg",
-    imgFile:"Les_Demoiselles_d%27Avignon.jpg"
-  },
-  "futurisms": {
-    title:"Futurisms", period:"ap 1909–1920", era:"Modernisms", color:"era-modern",
-    desc:"Itāļu kustība, kas slavināja kustību, ātrumu, tehnoloģiju un modernismu. Gleznās attēlota kustība ar vairākkārtīgu attēlu pārklājumu.",
-    features:["Kustības attēlojums","Ātrums","Tehnoloģija","Dinamisms"],
-    artworkTitle:"Pilsētas augšupcelšanās", artworkAuthor:"Umberto Bočoni, 1910–1911 · Ņujorka, MoMA",
-    img:"Umberto Boccioni - The City Rises.jpg",
-    imgFile:"Umberto_Boccioni_-_The_City_Rises.jpg"
-  },
-  "sirrealisums": {
-    title:"Sūrreālisms", period:"ap 1920–1950", era:"Modernisms", color:"era-modern",
-    desc:"Sapņu un zemapziņas realitāte gleznā. Sūrreālisti sekoja Freida idejām, radot iracionālas, sapņainas kompozīcijas. Dalī, Magrite, Ernsts, Kahlo.",
-    features:["Sapņu loģika","Zemapziņa","Iracionāls","Automatisms"],
-    artworkTitle:"Atmiņas noturīgums", artworkAuthor:"Salvadors Dalī, 1931 · Ņujorka, MoMA",
-    img:"The_Persistence_of_Memory.jpg",
-    imgFile:"The_Persistence_of_Memory.jpg"
-  },
-  "neformala": {
-    title:"Neformālā māksla", period:"ap 1940–1960", era:"Laikmetīgā māksla", color:"era-contemporary",
-    desc:"Abstrakts ekspresionisms un informels – mākslinieks darbojas ar krāsu instinktīvi, bez iepriekšēja plāna. Abstraktie ekspresionisti Ņujorkā (Poloks, de Kūnings).",
-    features:["Instinktīva darbība","Emocionāla abstrakcija","Gestikulācija","Matērija"],
-    artworkTitle:"Numurs 31", artworkAuthor:"Džeksons Poloks, 1950 · Ņujorka, MoMA",
-    img:"No._31.jpg",
-    imgFile:"No._31.jpg"
-  },
-  "popars": {
-    title:"Popārts", period:"ap 1956–1970", era:"Laikmetīgā māksla", color:"era-contemporary",
-    desc:"Augstā māksla tikās ar patēriņa kultūru – reklāmas, komiksi, slavenību attēli. Popārts apšaubīja mākslas un ikdienas robežu. Vorhols, Lihtenšteins.",
-    features:["Patēriņa simboli","Masveidots attēls","Ironija","Spilgtas krāsas"],
-    artworkTitle:"Marilyn Monro diptiks", artworkAuthor:"Endijs Vorhols, 1962 · Londona, Tate",
-    img:"Marilyn_Diptych_by_Andy_Warhol.jpg",
-    imgFile:"Marilyn_Monroe_-_publicity.JPG"
-  },
-  "jaunais-realisums": {
-    title:"Jaunais reālisms", period:"ap 1960–1980", era:"Laikmetīgā māksla", color:"era-contemporary",
-    desc:"Atgriešanās pie attēlojuma mākslas pēc abstrakcionisma – fotoreālisms un hiperreālisms. Ikdienas priekšmeti un cilvēki gleznoti ar fotokameras precizitāti.",
-    features:["Fotoreālisms","Precizitāte","Ikdienas motīvi","Lielformāts"],
-    artworkTitle:"Brīvības statuja (hiperrealisms)", artworkAuthor:"Ričards Estess, 1980",
-    img:"Chuck Close - Self-Portrait - Google Art Project.jpg",
-    imgFile:"Richard_Estes_Telephone_Booths.jpg"
-  },
-  "konceptuala": {
-    title:"Konceptuālā māksla", period:"ap 1960 – mūsdienās", era:"Laikmetīgā māksla", color:"era-contemporary",
-    desc:"Ideja ir svarīgāka par formu – mākslas darbs var būt instrukcija, teksts, performanse vai vide. Konceptuālā māksla apšaubīja mākslas definīciju un muzeja lomu.",
-    features:["Ideja pār formu","Instalācija","Performanse","Konceptuāls process"],
-    artworkTitle:"Viena un trīs krēsli", artworkAuthor:"Džozefs Kosuts, 1965 · Ņujorka, MoMA",
-    img:"Joseph_Kosuth_One_and_Three_Chairs.jpg",
-    imgFile:"One_and_Three_Chairs.jpg"
-  }
+ "akmens-laikmets": {
+  "title": "Akmens laikmets",
+  "period": "ap 2,5 milj. g. – 3000 g. p.m.ē. (māksla – pēdējos ~40 000 gados)",
+  "era": "Aizvēsture",
+  "color": "era-prehistoric",
+  "desc": "Cilvēces pirmās mākslinieciskās izpausmes – alu gleznojumi, petroglifi un nelielas skulptūras. Domājams, ka māksla bija saistīta ar maģiju un rituāliem; visbiežāk attēloti dzīvnieki.",
+  "features": [
+   "Alu gleznojumi",
+   "Petroglifi",
+   "Venēras figūriņas",
+   "Dabiskie pigmenti"
+  ],
+  "artworkTitle": "Altamiras alas bizoni (polihromie griesti)",
+  "artworkAuthor": "ap 15 000 g. p.m.ē. (madlēnas kultūra) · Altamira, Kantabrija, Spānija",
+  "img": "9_Bisonte_Magdaleniense_polícromo.jpg",
+  "imgFile": "9_Bisonte_Magdaleniense_polícromo.jpg",
+  "start": -600000,
+  "end": -3000,
+  "label": "Akmens laikmets"
+ },
+ "bronzas-laikmets": {
+  "title": "Bronzas laikmets",
+  "period": "ap 3000 – 800 g. p.m.ē. (Eiropā; Latvijā – vēlāk)",
+  "era": "Aizvēsture",
+  "color": "era-prehistoric",
+  "desc": "Tuvajos Austrumos rodas pirmās civilizācijas (Mezopotāmija, Ēģipte), Eiropā izplatās bronzas apstrāde. Metāla lējumi ļauj radīt sarežģītākus priekšmetus – ieročus, rotas, rituālos priekšmetus. Māksla kļūst saistīta ar varu un debess (Saules) kultu.",
+  "features": [
+   "Bronzas lējumi",
+   "Rotaslietas",
+   "Saules simbolika",
+   "Rituālie priekšmeti"
+  ],
+  "artworkTitle": "Nebras debess disks",
+  "artworkAuthor": "ap 1600 g. p.m.ē. (datējums tiek apspriests) · Valsts aizvēstures muzejs, Halle, Vācija",
+  "img": "Nebra_Scheibe.jpg",
+  "imgFile": "Nebra_Scheibe.jpg",
+  "start": -3000,
+  "end": -800,
+  "label": "Bronzas laikmets"
+ },
+ "dzelzs-laikmets": {
+  "title": "Dzelzs laikmets",
+  "period": "ap 800 g. p.m.ē. – mūsu ēras sākums (Eiropā; Latvijā dzelzs laikmets – 1.–12. gs.)",
+  "era": "Aizvēsture",
+  "color": "era-prehistoric",
+  "desc": "Dzelzs rīku un ieroču izplatīšanās. Eiropā uzplaukst ķeltu (Halštates un La Tēnas) māksla ar vijīgu, līklīniju ornamentu – spirālēm, virpuļiem, triskelēm –, bet stepēs – skitu dzīvnieku stils.",
+  "features": [
+   "Ķeltu līklīniju ornaments",
+   "Spirāles un triskeles",
+   "Emalja uz bronzas",
+   "Skitu dzīvnieku stils"
+  ],
+  "artworkTitle": "Batersijas vairogs",
+  "artworkAuthor": "ap 350–50 g. p.m.ē. · Britu muzejs, Londona",
+  "img": "British_Museum_Battersea_Shield.jpg",
+  "imgFile": "British_Museum_Battersea_Shield.jpg",
+  "start": -800,
+  "end": 0,
+  "label": "Dzelzs laikmets"
+ },
+ "mezopotamija": {
+  "title": "Mezopotāmijas māksla",
+  "period": "ap 3500 – 500 g. p.m.ē.",
+  "era": "Senā pasaule",
+  "color": "era-ancient",
+  "desc": "Starp Tigras un Eifratas upēm dzimušā civilizācija – šumeri, babilonieši, asīrieši – radīja zikurātus, reljefus un ķīļrakstu. Māksla slavināja valdniekus un dievus.",
+  "features": [
+   "Zikurāti",
+   "Ķīļraksts",
+   "Reljefi ar valdnieku tēliem",
+   "Glazēti ķieģeļi"
+  ],
+  "artworkTitle": "Hammurapi likumu stēla",
+  "artworkAuthor": "ap 1750 g. p.m.ē. · bazalts · Luvra, Parīze (atrasta Sūzā, Irānā)",
+  "img": "P1050763_Louvre_code_Hammurabi_face_rwk.JPG",
+  "imgFile": "P1050763_Louvre_code_Hammurabi_face_rwk.JPG",
+  "start": -3500,
+  "end": -500,
+  "label": "Mezopotāmijas (Divupes) māksla"
+ },
+ "egipte": {
+  "title": "Senās Ēģiptes māksla",
+  "period": "ap 3000 – 30 g. p.m.ē.",
+  "era": "Senā pasaule",
+  "color": "era-ancient",
+  "desc": "Ēģiptes māksla bija kanoniska – figūras attēlotas pēc noteiktiem proporciju likumiem un kombinētā skatījumā. Māksla kalpoja mūžības idejai – piramīdas, tempļi un kapeņu rotājumi. Amarnas periodā (faraons Ehnatons) kanons uz laiku kļuva brīvāks.",
+  "features": [
+   "Kombinētais skatījums",
+   "Hieratiskais mērogs",
+   "Hieroglifi",
+   "Monumentalitāte"
+  ],
+  "artworkTitle": "Nefertites biste",
+  "artworkAuthor": "Tutmoss (?), ap 1345 g. p.m.ē. · Ēģiptes muzejs (Neues Museum), Berlīne",
+  "img": "Nofretete_Neues_Museum.jpg",
+  "imgFile": "Nofretete_Neues_Museum.jpg",
+  "start": -3000,
+  "end": -30,
+  "label": "Senās Ēģiptes māksla"
+ },
+ "sena-griekija": {
+  "title": "Senās Grieķijas māksla",
+  "period": "ap 800 – 31 g. p.m.ē.",
+  "era": "Antīkā pasaule",
+  "color": "era-antique",
+  "desc": "Grieķu māksla attīstījās no ģeometriskiem motīviem līdz idealizētam reālismam. Trīs arhitektūras orderi – doriskais, joniskais un korintiskais – un skulptūra, kas slavē cilvēka ķermeņa skaistumu.",
+  "features": [
+   "Trīs orderi",
+   "Melnfigūru un sarkanfigūru vāzes",
+   "Mitoloģija",
+   "Ideālais ķermenis"
+  ],
+  "artworkTitle": "Partenons, Atēnu Akropole",
+  "artworkAuthor": "447–438 g. p.m.ē. · Atēnas",
+  "img": "The_Parthenon_in_Athens.jpg",
+  "imgFile": "The_Parthenon_in_Athens.jpg",
+  "start": -800,
+  "end": -31,
+  "label": "Senās Grieķijas māksla"
+ },
+ "sena-roma": {
+  "title": "Senās Romas māksla",
+  "period": "ap 500 g. p.m.ē. – 476 m.ē.",
+  "era": "Antīkā pasaule",
+  "color": "era-antique",
+  "desc": "Roma pārņēma grieķu tradīcijas, pievienojot praktisku monumentalitāti. Arka, velve un betons ļāva būvēt Kolizeju, akveduktus, tiltus un termas. Portrets kļuva reālistisks.",
+  "features": [
+   "Portreta skulptūra",
+   "Triumfa arkas",
+   "Freskas",
+   "Mozaīkas"
+  ],
+  "artworkTitle": "Kolizejs",
+  "artworkAuthor": "ap 70–80 m.ē. · Roma",
+  "img": "Colosseo_2020.jpg",
+  "imgFile": "Colosseo_2020.jpg",
+  "start": -500,
+  "end": 476,
+  "label": "Senās Romas māksla"
+ },
+ "antika": {
+  "title": "Antīkā māksla",
+  "period": "ap 800 g. p.m.ē. – 5. gs. m.ē.",
+  "era": "Antīkā pasaule",
+  "color": "era-antique",
+  "desc": "Senās Grieķijas un Romas māksla, kas izstrādāja ideālo cilvēka proporciju kanonu. Atēnu demokrātija un grieķu filozofija ietekmēja harmonijas, skaistuma un racionālisma principus.",
+  "features": [
+   "Ideālās proporcijas",
+   "Marmora skulptūra",
+   "Kontraposts",
+   "Kolonnādes"
+  ],
+  "artworkTitle": "Mīlas Venēra (Afrodīte no Mēlas salas)",
+  "artworkAuthor": "ap 150–100 g. p.m.ē. · Luvra, Parīze",
+  "img": "Venus_de_Milo_Louvre_Ma399.jpg",
+  "imgFile": "Venus_de_Milo_Louvre_Ma399.jpg",
+  "start": -800,
+  "end": 476,
+  "label": "Antīkā māksla"
+ },
+ "kristietibas-sakums": {
+  "title": "Kristietības sākums",
+  "period": "ap 200 – 500 m.ē. (2. gs. beigas – 5. gs.)",
+  "era": "Vēlā antīka",
+  "color": "era-medieval",
+  "desc": "Agrīnās kristietības simboliskā māksla – sākumā Romas katakombu sienu gleznojumos, pēc 313. gada – bazilikās ar mozaīkām. Simboli: zivs, enkurs, Hī-Rō monogramma, Labais Gans. Māksla kalpo ticības mācīšanai.",
+  "features": [
+   "Simbolisms",
+   "Freskas katakombās",
+   "Mozaīkas",
+   "Bazilikas"
+  ],
+  "artworkTitle": "Labais Gans",
+  "artworkAuthor": "3. gs. · Priscillas katakombas, Roma",
+  "img": "Good_Shepherd_Catacomb_of_Priscilla.jpg",
+  "imgFile": "Good_Shepherd_Catacomb_of_Priscilla.jpg",
+  "start": 200,
+  "end": 500,
+  "label": "Agrīnā kristīgā māksla"
+ },
+ "bizantija": {
+  "title": "Bizantijas māksla",
+  "period": "330–1453 (4.–15. gs.)",
+  "era": "Viduslaiki",
+  "color": "era-byzantine",
+  "desc": "Austrumromas (Bizantijas) impērijas reliģiskā māksla. Galvenie mākslas veidi – ikonas un mozaīkas ar zelta foniem; svēto tēli attēloti pēc stingriem kanoniem.",
+  "features": [
+   "Ikonas",
+   "Mozaīkas",
+   "Zelta fons",
+   "Gaismas simbolisms"
+  ],
+  "artworkTitle": "Kristus Pantokrators (apsīdas mozaīka)",
+  "artworkAuthor": "12. gs. vidus · Čefalū katedrāle, Sicīlija",
+  "img": "Cefalù_Pantocrator_retouched.jpg",
+  "imgFile": "Cefalù_Pantocrator_retouched.jpg",
+  "start": 330,
+  "end": 1453,
+  "label": "Bizantijas māksla"
+ },
+ "viduslaiki": {
+  "title": "Viduslaiku māksla",
+  "period": "5. – 15. gs.",
+  "era": "Viduslaiki",
+  "color": "era-medieval",
+  "desc": "Viduslaiku Eiropas māksla bija pakārtota Baznīcas mācībai – glezniecība, tēlniecība un arhitektūra kalpoja dievbijībai. Iluminētās rokraksta grāmatas un katedrāļu celtniecība.",
+  "features": [
+   "Reliģisks saturs",
+   "Zelta fons",
+   "Hieratiskums",
+   "Vitrāžas"
+  ],
+  "artworkTitle": "Šartras katedrāle",
+  "artworkAuthor": "12.–13. gs. · Francija",
+  "img": "Chartres_Cathedral_000.JPG",
+  "imgFile": "Chartres_Cathedral_000.JPG",
+  "start": 476,
+  "end": 1500,
+  "label": "Viduslaiku māksla"
+ },
+ "agrinie-viduslaiki": {
+  "title": "Agrīnie viduslaiki",
+  "period": "5. – 10. gs.",
+  "era": "Viduslaiki",
+  "color": "era-medieval",
+  "desc": "Tautu staigāšanas laiks un pirmie kristīgie gadsimti Eiropā. Ģermāņu, ķeltu un vēlāk vikingu ornamentālā māksla savijās ar kristīgajiem motīviem. Raksturīgs pīts ornaments, dzīvnieku stils un zeltkaļu darbi ar dārgakmeņu inkrustāciju.",
+  "features": [
+   "Pīts ornaments",
+   "Dzīvnieku stils",
+   "Zeltkalšana un granāti",
+   "Vikingu māksla"
+  ],
+  "artworkTitle": "Sutton Hū ķivere",
+  "artworkAuthor": "ap 625. g. · Britu muzejs, Londona",
+  "img": "Sutton_Hoo_helmet_2016.png",
+  "imgFile": "Sutton_Hoo_helmet_2016.png",
+  "start": 476,
+  "end": 1000,
+  "label": "Agrīnie viduslaiki"
+ },
+ "eiropasvidu": {
+  "title": "Salu (īru un anglosakšu) māksla",
+  "period": "ap 600 – 900 (7.–9. gs.)",
+  "era": "Viduslaiki",
+  "color": "era-medieval",
+  "desc": "Īrijas un Britānijas klosteros 7.–9. gs. tapa krāšņi iluminēti evaņģēliji. Ķeltu spirāles, pīts ornaments un stilizēti dzīvnieku motīvi tajos savijās ar kristīgo simboliku. Mūki rakstīja un zīmēja ar roku uz pergamenta – viena grāmata tapa gadiem.",
+  "features": [
+   "Iluminēti rokraksti",
+   "Pīts ornaments",
+   "Spirāles un dzīvnieku motīvi",
+   "Kristīgā simbolika"
+  ],
+  "artworkTitle": "Kellsas grāmata – Hī-Rō lappuse (34r)",
+  "artworkAuthor": "ap 800. g. · Trīsvienības koledža, Dublina",
+  "img": "KellsFol034rChiRhoMonogram.jpg",
+  "imgFile": "KellsFol034rChiRhoMonogram.jpg",
+  "start": 600,
+  "end": 900,
+  "label": "Salu māksla"
+ },
+ "romanika": {
+  "title": "Romānika",
+  "period": "ap 1000 – 1200 (11.–12. gs.)",
+  "era": "Viduslaiki",
+  "color": "era-medieval",
+  "desc": "Pirmais visā Rietumeiropā izplatītais viduslaiku stils – masīvas akmens celtnes ar biezām sienām, pusloka arkām un nelieliem logiem. Baznīcas bija svētceļnieku mērķis un garīgie centri, to portālus rotāja reljefi ar Bībeles ainām.",
+  "features": [
+   "Pusloka arkas",
+   "Masīvas sienas",
+   "Timpanona reljefi",
+   "Kolonnu arkādes"
+  ],
+  "artworkTitle": "Vezelē Sv. Marijas Magdalēnas bazilika – nārteksa timpanons",
+  "artworkAuthor": "ap 1120–1132 · Vezelē, Francija",
+  "img": "Vézelay_Narthex_Tympan_central_220608_01.jpg",
+  "imgFile": "Vézelay_Narthex_Tympan_central_220608_01.jpg",
+  "start": 1000,
+  "end": 1200,
+  "label": "Romānika"
+ },
+ "gotika": {
+  "title": "Gotika",
+  "period": "12. – 16. gs. sākums",
+  "era": "Viduslaiki",
+  "color": "era-medieval",
+  "desc": "Gotiskā arhitektūra tiecas augšup – smailas arkas, krusta velves ar ribām, augsti torņi. Velvju spiedienu uz āru novada arkbutāni un kontrforsi, tāpēc sienas var būt plānākas un tajās iebūvēti lieli logi ar krāsainām vitrāžām.",
+  "features": [
+   "Smailā arka",
+   "Vitrāžas",
+   "Arkbutāni un kontrforsi",
+   "Vertikālisms"
+  ],
+  "artworkTitle": "Parīzes Dievmātes katedrāle",
+  "artworkAuthor": "1163–1345 · Parīze",
+  "img": "Notre-Dame_de_Paris_2013-07-24.jpg",
+  "imgFile": "Notre-Dame_de_Paris_2013-07-24.jpg",
+  "start": 1140,
+  "end": 1520,
+  "label": "Gotika"
+ },
+ "renesanse": {
+  "title": "Renesanse",
+  "period": "ap 1400 – 1550 (Augstā renesanse ap 1500–1530)",
+  "era": "Renesanse",
+  "color": "era-renaissance",
+  "desc": "Atdzimšana – atgriešanās pie antīkajiem ideāliem, cilvēks kā visuma centrs. Humānisms, lineārā perspektīva, reālistiska anatomija. Leonardo, Mikelandželo, Rafaels.",
+  "features": [
+   "Lineārā perspektīva",
+   "Humānisms",
+   "Sfumato",
+   "Reālistiska anatomija"
+  ],
+  "artworkTitle": "Mona Liza",
+  "artworkAuthor": "Leonardo da Vinči, 1503–1519 · Luvra, Parīze",
+  "img": "Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+  "imgFile": "Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+  "start": 1400,
+  "end": 1550,
+  "label": "Renesanse"
+ },
+ "manierisums": {
+  "title": "Manierisms",
+  "period": "ap 1520 – 1600",
+  "era": "Renesanse",
+  "color": "era-renaissance",
+  "desc": "Renesanses vēlīnā fāze – apzināta novirze no harmonijas, izstieptas proporcijas, sarežģītas pozas. Mākslinieki eksperimentēja ar krāsu un telpas izkropļojumiem.",
+  "features": [
+   "Figura serpentinata",
+   "Izstieptas proporcijas",
+   "Mākslīgas, neparastas krāsas",
+   "Sarežģītas kompozīcijas"
+  ],
+  "artworkTitle": "Madonna ar garo kaklu",
+  "artworkAuthor": "Parmidžanīno, 1534–1540 · Ufici galerija, Florence",
+  "img": "Parmigianino_-_Madonna_dal_collo_lungo_-_Google_Art_Project.jpg",
+  "imgFile": "Parmigianino_-_Madonna_dal_collo_lungo_-_Google_Art_Project.jpg",
+  "start": 1520,
+  "end": 1600,
+  "label": "Manierisms"
+ },
+ "baroks": {
+  "title": "Baroks",
+  "period": "17. gs. – 18. gs. vidus (kulminācija Romā ap 1630–1680)",
+  "era": "Baroks",
+  "color": "era-baroque",
+  "desc": "Dramatisms, kustība un emocijas – baroks radās Itālijā 17. gs. sākumā kā katoļu Baznīcas Kontrreformācijas māksla, kas gribēja aizkustināt un pārsteigt skatītāju. Intensīva gaismas un ēnas spēle (chiaroscuro), diagonālas kompozīcijas, bagātīga dekorativitāte. Nīderlandes zelta laikmetā – ikdienas ainas (Vermērs, Rembrants). Karavadžo, Rubenss, Bernīni.",
+  "features": [
+   "Chiaroscuro",
+   "Dramatisms",
+   "Kustīgums",
+   "Diagonālas kompozīcijas"
+  ],
+  "artworkTitle": "Svētā Mateja aicinājums",
+  "artworkAuthor": "Karavadžo, 1599–1600 · Roma, Sanluidžī dei Frančēzi baznīca",
+  "img": "The_Calling_of_Saint_Matthew-Caravaggo_(1599-1600).jpg",
+  "imgFile": "The_Calling_of_Saint_Matthew-Caravaggo_(1599-1600).jpg",
+  "start": 1600,
+  "end": 1750,
+  "label": "Baroks"
+ },
+ "rokokko": {
+  "title": "Rokoko",
+  "period": "ap 1720 – 1780 (18. gs.)",
+  "era": "Rokoko",
+  "color": "era-baroque",
+  "desc": "Elegants, rotaļīgs un dekoratīvs stils, kas attīstījās Francijas galmā. Gaišas krāsas, vijīgas formas, mīlas un pastorālās ainas. Fragonārs, Vatō.",
+  "features": [
+   "Pasteļkrāsas",
+   "S-formas līknes",
+   "Galma elegance",
+   "Pastorālās ainas"
+  ],
+  "artworkTitle": "Šūpoles",
+  "artworkAuthor": "Žans Onorē Fragonārs, 1767 · Londona, Volesa kolekcija",
+  "img": "Fragonard,_The_Swing.jpg",
+  "imgFile": "Fragonard,_The_Swing.jpg",
+  "start": 1720,
+  "end": 1780,
+  "label": "Rokoko"
+ },
+ "klasicisms": {
+  "title": "Klasicisms",
+  "period": "ap 1750 – 1830 (18. gs. vidus – 19. gs. 1. puse)",
+  "era": "Klasicisms",
+  "color": "era-classical",
+  "desc": "Reakcija pret rokoko greznību – atgriešanās pie antīkās Grieķijas un Romas ideāliem: skaidrība, simetrija, kārtība, varonīgi un pilsoniski sižeti. To iedvesmoja Pompeju izrakumi un apgaismības idejas. Žaks Luī Davids, Kanova; arhitektūrā – kolonnas, frontoni.",
+  "features": [
+   "Antīkie motīvi",
+   "Simetrija",
+   "Normas un kārtība",
+   "Varonīgi sižeti"
+  ],
+  "artworkTitle": "Horāciju zvērests",
+  "artworkAuthor": "Žaks Luī Davids, 1784 · Parīze, Luvra",
+  "img": "Jacques-Louis_David,_Le_Serment_des_Horaces.jpg",
+  "imgFile": "Jacques-Louis_David,_Le_Serment_des_Horaces.jpg",
+  "start": 1750,
+  "end": 1830,
+  "label": "Klasicisms"
+ },
+ "ampirs": {
+  "title": "Ampīrs",
+  "period": "ap 1800–1830",
+  "era": "Klasicisms",
+  "color": "era-classical",
+  "desc": "Napoleona impērijas stils – monumentāls neoklasicisms ar romiešu un ēģiptiešu motīviem. Varenums, triumfs, imperatoriskā simbolika. Ampīrs galvenokārt izpaudās arhitektūrā, interjerā un mēbelēs.",
+  "features": [
+   "Imperatoriskā simbolika",
+   "Ēģiptiešu motīvi",
+   "Tumšas koksnes",
+   "Bronzas dekors"
+  ],
+  "artworkTitle": "Napoleona kronēšana",
+  "artworkAuthor": "Žaks Luī Davids, 1805–1807 · Parīze, Luvra",
+  "img": "Jacques-Louis_David_-_The_Coronation_of_Napoleon_(1805-1807).jpg",
+  "imgFile": "Jacques-Louis_David_-_The_Coronation_of_Napoleon_(1805-1807).jpg",
+  "start": 1800,
+  "end": 1830,
+  "label": "Ampīrs"
+ },
+ "romantisms": {
+  "title": "Romantisms",
+  "period": "ap 1780 – 1850 (kulminācija ap 1780–1830)",
+  "era": "Romantisms",
+  "color": "era-romantic",
+  "desc": "Emocijas pret prātu, daba pret pilsētu, eksotika un pagātne. Romantisms bija reakcija pret apgaismības racionālismu un industrializāciju, tas slavināja tautas garu un personiskās izjūtas.",
+  "features": [
+   "Emocionalitāte",
+   "Dabas grandiosums",
+   "Eksotika",
+   "Tautas eposs"
+  ],
+  "artworkTitle": "Brīvība ved tautu",
+  "artworkAuthor": "Ežēns Delakruā, 1830 · Luvra, Parīze",
+  "img": "Eugène_Delacroix_-_La_liberté_guidant_le_peuple.jpg",
+  "imgFile": "Eugène_Delacroix_-_La_liberté_guidant_le_peuple.jpg",
+  "start": 1780,
+  "end": 1850,
+  "label": "Romantisms"
+ },
+ "realisums": {
+  "title": "Reālisms",
+  "period": "ap 1840 – 1880 (19. gs. vidus)",
+  "era": "19. gs. vidus",
+  "color": "era-romantic",
+  "desc": "Reālisti 19. gs. vidū Francijā atteicās no idealizētiem varoņiem un vēstures sižetiem un gleznoja to, ko paši redzēja – zemniekus, strādniekus, ikdienas dzīvi, bieži ar sociālās kritikas skatu. Gistavs Kurbē, Žans Fransuā Millē, Onorē Domjē.",
+  "features": [
+   "Ikdienas motīvi",
+   "Vienkārši cilvēki",
+   "Sociālā kritika",
+   "Neidealizēts attēlojums"
+  ],
+  "artworkTitle": "Vārpu lasītājas",
+  "artworkAuthor": "Žans Fransuā Millē, 1857 · Parīze, Orsē muzejs",
+  "img": "Jean-François_Millet_-_Gleaners_-_Google_Art_Project_2.jpg",
+  "imgFile": "Jean-François_Millet_-_Gleaners_-_Google_Art_Project_2.jpg",
+  "start": 1840,
+  "end": 1880,
+  "label": "Reālisms"
+ },
+ "impresionisms": {
+  "title": "Impresionisms",
+  "period": "ap 1860 – 1900 (pirmā izstāde – 1874)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Impresionisti gleznoja brīvā dabā (plenērā), tverot gaismas un gaisa mainīgos efektus. Triepieni ir redzami, krāsa veido iespaidu (impresiju), nevis precīzu kontūru. Nosaukums radies no Monē gleznas „Impresija. Saullēkts” (1874. g. izstāde). Monē, Renuārs, Pisaro, Degā, Morizo.",
+  "features": [
+   "Gaismas efekti",
+   "Āra gleznošana",
+   "Redzamie triepieni",
+   "Kustīgums"
+  ],
+  "artworkTitle": "Impresija. Saullēkts",
+  "artworkAuthor": "Klods Monē, 1872 · Parīze, Marmotāna-Monē muzejs",
+  "img": "Claude_Monet,_Impression,_soleil_levant.jpg",
+  "imgFile": "Claude_Monet,_Impression,_soleil_levant.jpg",
+  "start": 1860,
+  "end": 1900,
+  "label": "Impresionisms"
+ },
+ "simbolisms": {
+  "title": "Simbolisms",
+  "period": "ap 1880 – 1910 (terminu 1886. g. ieviesa Žans Moreass)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Simbolisti 19. gs. beigās pretojās reālismam un impresionismam – nevis attēlot redzamo, bet izteikt ideju, sapni, noskaņu. Sapņi, mīti, nāve, mīlestība un baiļu tēmas. Gistavs Moro, Odilons Redons, Pols Gogēns; Vīnē – Gustavs Klimts.",
+  "features": [
+   "Misticisms",
+   "Sapņainums",
+   "Mitoloģija",
+   "Jutekliskums"
+  ],
+  "artworkTitle": "Skūpsts",
+  "artworkAuthor": "Gustavs Klimts, 1907–1908 · Vīne, Belvedere",
+  "img": "The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+  "imgFile": "The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+  "start": 1880,
+  "end": 1910,
+  "label": "Simbolisms"
+ },
+ "postimpresionisms": {
+  "title": "Postimpresionisms",
+  "period": "ap 1886 – 1910 (terminu 1910. g. ieviesa Rodžers Frajs)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Impresionisma pārveidošana – katrs mākslinieks devās savā virzienā. Sezāns pētīja ģeometriskās formas, Van Gogs – emocijas caur krāsu, Gogēns – primitīvismu.",
+  "features": [
+   "Formu ģeometrizācija",
+   "Emocionālā krāsa",
+   "Primitīvisms",
+   "Puantilisms"
+  ],
+  "artworkTitle": "Saulespuķes",
+  "artworkAuthor": "Vincents van Gogs, 1888 · Londona, Nacionālā galerija",
+  "img": "Vincent_van_Gogh_-_Sunflowers_(1888,_National_Gallery_London).jpg",
+  "imgFile": "Vincent_van_Gogh_-_Sunflowers_(1888,_National_Gallery_London).jpg",
+  "start": 1886,
+  "end": 1910,
+  "label": "Postimpresionisms"
+ },
+ "jugendstils": {
+  "title": "Jūgendstils / Art Nouveau",
+  "period": "ap 1890 – 1914 (līdz Pirmajam pasaules karam)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Visas mākslas apvienošana vienā – arhitektūra, mēbeles, plakāts, tekstils. Organiskās formas, vijīgas līnijas, augu un dzīvnieku motīvi. Klimts, Muha, Gaudī. Rīgā – viena no bagātākajām jūgendstila arhitektūras kolekcijām Eiropā.",
+  "features": [
+   "Organiskās formas",
+   "Vijīgas līnijas",
+   "Dekoratīvisms",
+   "Augu motīvi"
+  ],
+  "artworkTitle": "Plakāts „Žismonda”",
+  "artworkAuthor": "Alfons Muha, 1894 · litogrāfija (plakāts Sāras Bernāras izrādei)",
+  "img": "Alphonse Mucha - Poster for Victorien Sardou's Gismonda starring Sarah Bernhardt.jpg",
+  "imgFile": "Alphonse Mucha - Poster for Victorien Sardou's Gismonda starring Sarah Bernhardt.jpg",
+  "start": 1890,
+  "end": 1914,
+  "label": "Jūgendstils"
+ },
+ "fovisms": {
+  "title": "Fovisms",
+  "period": "ap 1905 – 1910",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "„Mežonīgo zvēru” (fr. les fauves) krāsu eksplozija – krāsa vairs nav reālistiska, bet ir emocionāla un patstāvīga. Matiss un Derēns izmantoja tīras, spilgtas krāsas. Nosaukumu 1905. gadā deva kritiķis Luiss Voksels.",
+  "features": [
+   "Tīras krāsas",
+   "Krāsas autonomija",
+   "Vienkāršotas formas",
+   "Prieks"
+  ],
+  "artworkTitle": "Deja",
+  "artworkAuthor": "Anrī Matiss, 1910 · Sanktpēterburga, Ermitāža (pirmā versija, 1909 – MoMA, Ņujorka)",
+  "img": "Matissedance.jpg",
+  "imgFile": "Matissedance.jpg",
+  "start": 1905,
+  "end": 1910,
+  "label": "Fovisms"
+ },
+ "ekspresionisms": {
+  "title": "Ekspresionisms",
+  "period": "ap 1905–1925",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Mākslinieka iekšējo pārdzīvojumu izpausme – formu deformācija, spilgtas, nereālistiskas krāsas, nemiers. Bieži atspoguļo modernās pilsētas trauksmi un sociālo kritiku. Vācijā – grupas „Tilts” (1905) un „Zilais jātnieks” (1911).",
+  "features": [
+   "Deformācija",
+   "Spilgtas krāsas",
+   "Nemiers",
+   "Emocionālā patiesība"
+  ],
+  "artworkTitle": "Kliedziens",
+  "artworkAuthor": "Edvards Munks, 1893 · Oslo, Nacionālais muzejs (ekspresionisma priekštecis)",
+  "img": "The_Scream_by_Edvard_Munch,_1893_-_Nasjonalgalleriet.png",
+  "imgFile": "The_Scream_by_Edvard_Munch,_1893_-_Nasjonalgalleriet.png",
+  "start": 1905,
+  "end": 1925,
+  "label": "Ekspresionisms"
+ },
+ "kubisms": {
+  "title": "Kubisms",
+  "period": "ap 1907 – 1920 (aizsākums 1907–1908, Pikaso un Braks)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Pikaso un Braks sadrupa reālistisko skatu – objekti redzami no vairākiem skatpunktiem vienlaicīgi, ģeometrizēti. Kubisms radīja revolūciju divdimensiju attēlojumā.",
+  "features": [
+   "Daudzie skatpunkti",
+   "Ģeometrizācija",
+   "Kolāža",
+   "Analītiskais kubisms"
+  ],
+  "artworkTitle": "Avinjonas jaunavas",
+  "artworkAuthor": "Pablo Pikaso, 1907 · Ņujorka, MoMA",
+  "img": "Les_Demoiselles_d'Avignon.jpg",
+  "imgFile": "Les_Demoiselles_d'Avignon.jpg",
+  "start": 1907,
+  "end": 1920,
+  "label": "Kubisms"
+ },
+ "futurisms": {
+  "title": "Futurisms",
+  "period": "ap 1909 – 1920 (Marineti manifests, 1909)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Itāļu kustība, kas slavināja kustību, ātrumu, tehnoloģiju un modernismu. Gleznās attēlota kustība ar vairākkārtīgu attēlu pārklājumu.",
+  "features": [
+   "Kustības attēlojums",
+   "Ātrums",
+   "Tehnoloģija",
+   "Dinamisms"
+  ],
+  "artworkTitle": "Pilsētas augšupcelšanās",
+  "artworkAuthor": "Umberto Bočoni, 1910–1911 · Ņujorka, MoMA",
+  "img": "The City Rises by Umberto Boccioni 1910.jpg",
+  "imgFile": "The City Rises by Umberto Boccioni 1910.jpg",
+  "start": 1909,
+  "end": 1920,
+  "label": "Futurisms"
+ },
+ "sirrealisums": {
+  "title": "Sirreālisms",
+  "period": "ap 1924 – 1950 (Bretona „Sirreālisma manifests”, 1924)",
+  "era": "Modernisms",
+  "color": "era-modern",
+  "desc": "Sapņu un zemapziņas realitāte gleznā. Sirreālisti sekoja Freida idejām, radot iracionālas, sapņainas kompozīcijas. Dalī, Magrits, Ernsts, Kahlo.",
+  "features": [
+   "Sapņu loģika",
+   "Zemapziņa",
+   "Iracionalitāte",
+   "Automatisms"
+  ],
+  "artworkTitle": "Atmiņas noturīgums",
+  "artworkAuthor": "Salvadors Dalī, 1931 · Ņujorka, MoMA",
+  "img": "The_Persistence_of_Memory.jpg",
+  "imgFile": "The_Persistence_of_Memory.jpg",
+  "start": 1924,
+  "end": 1950,
+  "label": "Sirreālisms"
+ },
+ "neformala": {
+  "title": "Informālā māksla un abstraktais ekspresionisms",
+  "period": "1940. un 1950. gadi",
+  "era": "Laikmetīgā māksla",
+  "color": "era-contemporary",
+  "desc": "Abstraktais ekspresionisms un informālā māksla – mākslinieks darbojas ar krāsu instinktīvi, bez iepriekšēja plāna. Eiropā – informālā māksla (fr. art informel), Ņujorkā – abstraktie ekspresionisti (Poloks, de Kūnings).",
+  "features": [
+   "Instinktīva darbība",
+   "Emocionāla abstrakcija",
+   "Gestikulācija",
+   "Matērija"
+  ],
+  "artworkTitle": "Viens: Numurs 31, 1950",
+  "artworkAuthor": "Džeksons Poloks, 1950 · Ņujorka, MoMA",
+  "img": "Regarding_One.jpg",
+  "imgFile": "Regarding_One.jpg",
+  "start": 1940,
+  "end": 1960,
+  "label": "Informālā māksla"
+ },
+ "popars": {
+  "title": "Popārts",
+  "period": "ap 1955 – 1970 (rodas 50. gados, uzplaukst 60. gados)",
+  "era": "Laikmetīgā māksla",
+  "color": "era-contemporary",
+  "desc": "Augstā māksla tikās ar patēriņa kultūru – reklāmas, komiksi, slavenību attēli. Popārts apšaubīja mākslas un ikdienas robežu. Vorhols, Lihtenšteins.",
+  "features": [
+   "Patēriņa simboli",
+   "Masveida attēli (sietspiede)",
+   "Ironija",
+   "Spilgtas krāsas"
+  ],
+  "artworkTitle": "Merilinas Monro diptihs",
+  "artworkAuthor": "Endijs Vorhols, 1962 · Londona, Tate",
+  "img": "Marilyndiptych.jpg",
+  "imgFile": "Marilyndiptych.jpg",
+  "start": 1955,
+  "end": 1970,
+  "label": "Popārts"
+ },
+ "jaunais-realisums": {
+  "title": "Fotoreālisms (hiperreālisms)",
+  "period": "no 1960. gadu beigām – 1980 (termins „hiperreālisms” – 1970. gadu sākumā)",
+  "era": "Laikmetīgā māksla",
+  "color": "era-contemporary",
+  "desc": "Atgriešanās pie precīza attēlojuma pēc abstrakcionisma – gleznas, kas atgādina fotogrāfiju. Pilsētas skati, skatlogi, portreti gleznoti ar fotokameras precizitāti (Estess, Klouzs).",
+  "features": [
+   "Fotogrāfiska precizitāte",
+   "Pilsētas motīvi",
+   "Atspulgi",
+   "Lielformāts"
+  ],
+  "artworkTitle": "Telefona būdiņas",
+  "artworkAuthor": "Ričards Estess, 1967 · Madride, Tisena-Bornemisas muzejs",
+  "img": "Richard_Estes_Telephone_Booths.jpg",
+  "imgFile": "Richard_Estes_Telephone_Booths.jpg",
+  "start": 1968,
+  "end": 1980,
+  "label": "Fotoreālisms"
+ },
+ "konceptuala": {
+  "title": "Konceptuālā māksla",
+  "period": "kustība – 1960. gadu vidus līdz 1970. gadu vidum; idejas turpinās līdz mūsdienām",
+  "era": "Laikmetīgā māksla",
+  "color": "era-contemporary",
+  "desc": "Ideja ir svarīgāka par formu – mākslas darbs var būt instrukcija, teksts, performanse vai vide. Konceptuālā māksla apšaubīja mākslas definīciju un muzeja lomu.",
+  "features": [
+   "Ideja pār formu",
+   "Instalācija",
+   "Performanse",
+   "Konceptuāls process"
+  ],
+  "artworkTitle": "Viens un trīs krēsli",
+  "artworkAuthor": "Džozefs Kosuts, 1965 · Ņujorka, MoMA",
+  "img": "One_and_Three_Chair.jpg",
+  "imgFile": "One_and_Three_Chair.jpg",
+  "start": 1965,
+  "end": 2026,
+  "label": "Konceptuālā māksla"
+ },
+ "pirmatneja": {
+  "title": "Tradicionālo kultūru māksla",
+  "period": "dažādos laikos un reģionos – līdz pat mūsdienām",
+  "era": "Dažādi laikmeti",
+  "color": "era-prehistoric",
+  "desc": "Tradicionālo un cilšu sabiedrību vizuālā izteiksme Āfrikā, Okeānijā, Amerikā u. c. – totēmi, rituālās maskas, keramika, ķermeņa rotāšana. Šī māksla nav „primitīva” – tā ir sena, bagāta tradīcija ar savu simbolu valodu.",
+  "features": [
+   "Totēmi",
+   "Rituālās maskas",
+   "Ķermeņa māksla",
+   "Keramika"
+  ],
+  "artworkTitle": "Moai statujas, Rano Raraku",
+  "artworkAuthor": "ap 1250–1500 · Rapanui (Lieldienu sala), Čīle",
+  "img": "Moai_Rano_raraku.jpg",
+  "imgFile": "Moai_Rano_raraku.jpg",
+  "start": -40000,
+  "end": 2026,
+  "label": "Tradicionālo kultūru māksla — dažādos laikos visā pasaulē"
+ }
 };
  
 const COLOR_MAP = {
@@ -697,117 +1132,121 @@ const COLOR_MAP = {
   'era-contemporary':'linear-gradient(135deg,#0a2a1a,#1a5a4a)',
 };
  
-const U = 10;
-const ROWS = [
-  [{key:null,w:18,color:'era-axis'},{key:'antika',label:'Antīkā māksla',w:52,color:'era-antique'},{key:null,w:210,color:'era-axis'}],
-  [{key:null,w:10,color:'era-axis'},{key:'sena-griekija',label:'Senās Grieķijas māksla',w:34,color:'era-antique'},{key:'sena-roma',label:'Senās Romas māksla',w:25,color:'era-antique'},{key:null,w:211,color:'era-axis'}],
-  [{key:null,w:6,color:'era-axis'},{key:'mezopotamija',label:'Mezopotāmijas (Divupes) māksla',w:31,color:'era-ancient'},{key:null,w:243,color:'era-axis'}],
-  [{key:null,w:4,color:'era-axis'},{key:'egipte',label:'Senās Ēģiptes māksla',w:31,color:'era-ancient'},{key:null,w:245,color:'era-axis'}],
-  [
-    {key:'pirmatneja',label:'Pirmatnējā māksla',w:16,color:'era-prehistoric'},
-    {key:null,w:16,color:'era-axis'},
-    {key:'kristietibas-sakums',label:'Kristietības sākums',w:4,color:'era-medieval'},
-    {key:'viduslaiki',label:'Viduslaiku māksla',w:44,color:'era-medieval'},
-    {key:'renesanse',label:'Renesanse',w:10,color:'era-renaissance'},
-    {key:'manierisums',label:'Manierisums',w:8,color:'era-renaissance'},
-    {key:'baroks',label:'Baroks',w:12,color:'era-baroque'},
-    {key:'rokokko',label:'Rokoko',w:8,color:'era-baroque'},
-    {key:'realisums',label:'Reālisms',w:8,color:'era-baroque'},
-    {key:'klasicisms',label:'Klasicisms',w:9,color:'era-classical'},
-    {key:'ampirs',label:'Ampīrs',w:5,color:'era-classical'},
-    {key:'romantisms',label:'Romantisms',w:9,color:'era-romantic'},
-    {key:'simbolisms',label:'Simbolisms',w:6,color:'era-romantic'},
-    {key:'impresionisms',label:'Impresionisms',w:7,color:'era-modern'},
-    {key:'postimpresionisms',label:'Postimpresionisms',w:7,color:'era-modern'},
-    {key:'jugendstils',label:'Jūgendstils',w:6,color:'era-modern'},
-    {key:'ekspresionisms',label:'Ekspresionisms',w:7,color:'era-modern'},
-    {key:'fovisms',label:'Fovisms',w:5,color:'era-modern'},
-    {key:'kubisms',label:'Kubisms',w:6,color:'era-modern'},
-    {key:'futurisms',label:'Futurisms',w:6,color:'era-modern'},
-    {key:'sirrealisums',label:'Sūrreālisms',w:8,color:'era-modern'},
-    {key:'neformala',label:'Neformālā māksla',w:8,color:'era-contemporary'},
-    {key:'popars',label:'Popārts',w:6,color:'era-contemporary'},
-    {key:'jaunais-realisums',label:'Jaunais reālisms',w:8,color:'era-contemporary'},
-    {key:'konceptuala',label:'Konceptuālā māksla',w:10,color:'era-contemporary'},
-  ],
-  [{key:null,w:36,color:'era-axis'},{key:'bizantija',label:'Bizantijas māksla',w:38,color:'era-byzantine'},{key:null,w:206,color:'era-axis'}],
-  [{key:null,w:36,color:'era-axis'},{key:'eiropasvidu',label:'Eiropas viduslaiku māksla',w:38,color:'era-medieval'},{key:null,w:206,color:'era-axis'}],
-  [{key:'akmens-laikmets',label:'akmens laikmets',w:12,color:'era-prehistoric'},{key:null,w:8,color:'era-axis'},{key:'bronzas-laikmets',label:'bronzas laikmets',w:10,color:'era-prehistoric'},{key:null,w:4,color:'era-axis'},{key:'dzelzs-laikmets',label:'dzelzs laikmets',w:14,color:'era-prehistoric'},{key:null,w:232,color:'era-axis'}],
-  [{key:null,w:36,color:'era-axis'},{key:'agrinie-viduslaiki',label:'Agrīnie viduslaiki',w:16,color:'era-medieval'},{key:null,w:4,color:'era-axis'},{key:'romanika',label:'Romānika',w:10,color:'era-medieval'},{key:null,w:2,color:'era-axis'},{key:'gotika',label:'Gotika',w:10,color:'era-medieval'},{key:null,w:202,color:'era-axis'}],
+/* ── Laika ass: bloku vieta tiek aprēķināta no sākuma un beigu gadiem ──
+   Mērogs ir posmos lineārs (nav vienmērīgs): senie laikmeti saspiesti, jaunākie izstiepti. */
+const U = 14;                       // px vienā mēroga vienībā
+const ANCHORS = [                    // [gads, pozīcija vienībās]; p.m.ē. = negatīvs gads
+  [-600000,0],[-40000,6],[-10000,12],[-4000,20],[-3000,26],[-2000,34],[-1000,42],[-500,47],[0,52],
+  [500,58],[1000,66],[1200,74],[1300,80],[1400,88],[1500,98],[1600,110],[1700,122],[1800,136],
+  [1850,148],[1900,162],[1925,176],[1950,190],[1975,204],[2000,216],[2026,226]
 ];
- 
-const TICKS = [
-  {label:'600 000 g.',pos:0},{label:'40 000',pos:3},{label:'10 000',pos:5},
-  {label:'6000 g.p.m.ē.',pos:8},{label:'4000',pos:10},{label:'3000',pos:12},
-  {label:'1200',pos:14},{label:'1000',pos:16},{label:'800',pos:18},{label:'400',pos:20},
-  {label:'2.gs.p.m.ē.',pos:23},{label:'1.gs.',pos:26},{label:'IV gs.',pos:30},
-  {label:'V gs.',pos:32},{label:'X gs.',pos:40},{label:'XIII gs.',pos:48},
-  {label:'XV gs.',pos:56},{label:'XVI gs.',pos:64},{label:'XVII gs.',pos:76},
-  {label:'XVIII gs.',pos:90},{label:'XIX gs.',pos:110},{label:'XX gs.',pos:140},
-  {label:'XXI gs.',pos:200},
-];
- 
-// Build rows
+function yearToPos(y){
+  if (y <= ANCHORS[0][0]) return 0;
+  for (let i=1;i<ANCHORS.length;i++){
+    const [y0,p0]=ANCHORS[i-1], [y1,p1]=ANCHORS[i];
+    if (y <= y1) return p0 + (p1-p0)*(y-y0)/(y1-y0);
+  }
+  return ANCHORS[ANCHORS.length-1][1];
+}
+const X = y => Math.round(yearToPos(y)*U);
+const TOTAL_W = X(2026) + 60;
+
+function tickLabel(y){
+  const a = Math.abs(y);
+  const n = a >= 10000 ? a.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ') : a.toString();
+  if (y < 0)  return n + '<small>p.m.ē.</small>';
+  if (y === 0) return '0<small>m.ē. sākums</small>';
+  if (y < 1000) return n + '<small>m.ē.</small>';
+  return n;
+}
+
 const canvas = document.getElementById('timelineCanvas');
-ROWS.forEach((rowDef, rowIdx) => {
-  const rowEl = document.createElement('div');
-  let cls = 'row';
-  if (rowIdx < 2) cls += ' wide-row';
-  if (rowIdx === 4) cls += ' style-row';
-  rowEl.className = cls;
-  rowDef.forEach(b => {
+canvas.style.width = TOTAL_W + 'px';
+const laneArea = document.createElement('div');
+laneArea.className = 'lane-area';
+canvas.appendChild(laneArea);
+
+// Režģa līnijas un ass
+const axis = document.createElement('div');
+axis.className = 'axis';
+ANCHORS.forEach(([y]) => {
+  const gl = document.createElement('div');
+  gl.className = 'grid-line' + (y===0 ? ' zero' : '');
+  gl.style.left = X(y) + 'px';
+  laneArea.appendChild(gl);
+  const t = document.createElement('div');
+  t.className = 'axis-tick' + (y===0 ? ' zero' : '');
+  t.style.left = X(y) + 'px';
+  t.innerHTML = tickLabel(y);
+  axis.appendChild(t);
+});
+canvas.appendChild(axis);
+
+function buildBlocks(){
+  // teksta platuma mērīšana
+  const meas = document.createElement('span');
+  meas.className = 'block-measure';
+  canvas.appendChild(meas);
+  const items = Object.entries(DATA).map(([key,d]) => {
+    const x0 = X(d.start), x1 = X(d.end);
+    const w = Math.max(8, x1 - x0);
+    meas.textContent = d.label;
+    const lw = meas.offsetWidth + 10;
+    const fits = lw <= w;
+    return {key, d, x0, w, fits, occ: fits ? w : w + 8 + lw};
+  });
+  meas.remove();
+
+  // Joslu izkārtojums: hronoloģiski, katrs bloks pirmajā brīvajā joslā
+  const special = items.filter(it => it.key === 'pirmatneja');
+  const rest = items.filter(it => it.key !== 'pirmatneja')
+                    .sort((a,b) => a.d.start - b.d.start || (b.d.end-b.d.start) - (a.d.end-a.d.start));
+  const lanes = [];
+  rest.forEach(it => {
+    let li = lanes.findIndex(r => r <= it.x0 - 4);
+    if (li === -1) { li = lanes.length; lanes.push(0); }
+    lanes[li] = it.x0 + it.occ;
+    it.lane = li;
+  });
+  special.forEach(it => { it.lane = lanes.length; });
+  const nLanes = lanes.length + special.length;
+
+  const H = laneArea.clientHeight;
+  const GAP = 5;
+  const laneH = Math.min(62, Math.floor((H - GAP*(nLanes-1)) / nLanes));
+  items.forEach(it => {
     const el = document.createElement('div');
-    el.className = 'block ' + b.color;
-    const px = b.w * U;
-    el.style.cssText = `width:${px}px;min-width:${px}px`;
-    if (b.key) {
-      el.textContent = b.label;
-      el.dataset.key = b.key;
-      el.dataset.px = px;
-      el.addEventListener('click', () => openModal(b.key, el));
-    }
-    rowEl.appendChild(el);
+    el.className = 'block ' + it.d.color + (it.fits ? '' : ' outlabel') + (it.key==='pirmatneja' ? ' wide-left' : '');
+    el.style.left = it.x0 + 'px';
+    el.style.width = it.w + 'px';
+    el.style.top = (it.lane*(laneH+GAP)) + 'px';
+    el.style.height = laneH + 'px';
+    el.dataset.key = it.key;
+    el.title = it.d.title + ' · ' + it.d.period;
+    const lbl = document.createElement('span');
+    lbl.className = 'lbl';
+    lbl.textContent = it.d.label;
+    el.appendChild(lbl);
+    el.addEventListener('click', () => { if (dragMoved) return; openModal(it.key, el); });
+    laneArea.appendChild(el);
   });
-  canvas.appendChild(rowEl);
-});
- 
-// Vertical text for narrow blocks
-requestAnimationFrame(() => {
-  document.querySelectorAll('.block[data-key]').forEach(el => {
-    if (parseInt(el.dataset.px) < 80) el.classList.add('vertical');
-  });
-});
- 
-// Axis
-const axisRow = document.createElement('div');
-axisRow.className = 'axis-row';
-axisRow.style.minWidth = (280 * U) + 'px';
-let prev = 0;
-TICKS.forEach(t => {
-  const sp = document.createElement('div');
-  sp.style.cssText = `width:${(t.pos-prev)*U}px;min-width:${(t.pos-prev)*U}px;flex-shrink:0`;
-  axisRow.appendChild(sp);
-  const tick = document.createElement('div');
-  tick.className = 'axis-tick';
-  tick.textContent = t.label;
-  tick.style.minWidth = '1px';
-  axisRow.appendChild(tick);
-  prev = t.pos;
-});
-canvas.appendChild(axisRow);
+}
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => requestAnimationFrame(buildBlocks));
  
 // Drag scroll
 const outer = document.getElementById('timelineOuter');
 let dragging = false, sx, sl;
-outer.addEventListener('mousedown', e => { dragging=true; sx=e.pageX-outer.offsetLeft; sl=outer.scrollLeft; });
+var dragMoved = false;   // lai vilkšana neatvērtu kartīti
+outer.addEventListener('mousedown', e => { dragging=true; dragMoved=false; sx=e.pageX-outer.offsetLeft; sl=outer.scrollLeft; });
 window.addEventListener('mouseup', () => { dragging=false; });
 outer.addEventListener('mousemove', e => {
   if (!dragging) return;
   e.preventDefault();
-  outer.scrollLeft = sl - (e.pageX - outer.offsetLeft - sx);
+  if (Math.abs(e.pageX - outer.offsetLeft - sx) > 5) dragMoved = true;
+  outer.scrollLeft = sl - (e.pageX - outer.offsetLeft - sx)/(window.APP_SCALE||1);
 });
 outer.addEventListener('touchstart', e => { sx=e.touches[0].pageX; sl=outer.scrollLeft; }, {passive:true});
-outer.addEventListener('touchmove', e => { outer.scrollLeft = sl-(e.touches[0].pageX-sx); }, {passive:true});
+outer.addEventListener('touchmove', e => { outer.scrollLeft = sl-(e.touches[0].pageX-sx)/(window.APP_SCALE||1); }, {passive:true});
  
 // Load artwork image — fetch as blob to bypass CORS hotlink blocking
 async function loadArtworkImage(d) {
@@ -816,6 +1255,17 @@ async function loadArtworkImage(d) {
   img.alt = d.artworkTitle;
   img.src = '';
   img.style.display = 'block';
+  img.onerror = null;
+  wrap.onclick = null;
+  document.getElementById('artworkNoImg').style.display = 'none';
+  document.getElementById('artworkZoomHint').style.display = '';
+  const noImg = () => {
+    wrap.style.background = '#efe9dc';
+    img.style.display = 'none';
+    wrap.onclick = null;
+    document.getElementById('artworkZoomHint').style.display = 'none';
+    document.getElementById('artworkNoImg').style.display = 'block';
+  };
   wrap.style.background = '#e8e4dc';
  
   const filename = d.imgFile || d.img;
@@ -842,11 +1292,7 @@ async function loadArtworkImage(d) {
     } catch(e) {}
   }
  
-  if (!thumbUrl) {
-    wrap.style.background = '#d0c8b8';
-    img.style.display = 'none';
-    return;
-  }
+  if (!thumbUrl) { noImg(); return; }
  
   // Step 2: fetch the image as blob (avoids hotlink referer check)
   try {
@@ -862,7 +1308,7 @@ async function loadArtworkImage(d) {
  
   // Step 3: direct src as last resort
   img.src = thumbUrl;
-  img.onerror = () => { wrap.style.background = '#d0c8b8'; img.style.display = 'none'; };
+  img.onerror = noImg;
   wrap.onclick = () => openLightbox(thumbUrl, d.artworkTitle + ' · ' + d.artworkAuthor);
 }
  
@@ -903,6 +1349,38 @@ function openLightbox(src, caption) {
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
 document.getElementById('lightbox').addEventListener('click', e=>{ if(e.target===document.getElementById('lightbox')) closeLightbox(); });
+</script>
+
+<script>
+/* ── 16:9 mērogošana un pilnekrāns ── */
+(function(){
+  const app = document.getElementById('app');
+  window.APP_SCALE = 1;
+  function fitApp(){
+    const W = window.innerWidth, H = window.innerHeight;
+    const sc = Math.min(W/1600, H/900); window.APP_SCALE = sc;
+    app.style.transform = 'scale(' + sc + ')';
+    app.style.left = Math.max(0,(W-1600*sc)/2) + 'px';
+    app.style.top  = Math.max(0,(H-900*sc)/2) + 'px';
+  }
+  window.addEventListener('resize', fitApp); fitApp();
+  const btn = document.getElementById('fsBtn');
+  function isFs(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function fallback(){ if(confirm('Pilnekrāna režīms šajā logā nav pieejams. Atvērt rīku jaunā cilnē?')) window.open(location.href,'_blank'); }
+  function toggle(){
+    const el = document.documentElement;
+    try{
+      if(isFs()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else if(el.requestFullscreen) el.requestFullscreen().catch(fallback);
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else fallback();
+    }catch(e){ fallback(); }
+  }
+  function upd(){ btn.textContent = isFs() ? '✕ Iziet no pilnekrāna' : '⛶ Atvērt pilnekrānu'; setTimeout(fitApp, 60); }
+  btn.addEventListener('click', toggle);
+  document.addEventListener('fullscreenchange', upd);
+  document.addEventListener('webkitfullscreenchange', upd);
+})();
 </script>
 </body>
 </html>
